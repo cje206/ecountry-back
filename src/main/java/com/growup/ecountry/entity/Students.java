@@ -1,8 +1,14 @@
 package com.growup.ecountry.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Students {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,7 +18,7 @@ public class Students {
     private String name;
 
     @Column(nullable = false)
-    private Integer roll_number;
+    private Integer rollNumber;
 
     @Column(nullable = false)
     private String pw;
