@@ -39,7 +39,7 @@ public class Countries {
     private Integer salaryDate;
 
     @ManyToOne
-    @JoinTable(name = "user_id")
+    @JoinColumn(name = "user_id")
     private Users users;
 
     @OneToMany(mappedBy = "countries")
