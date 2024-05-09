@@ -1,10 +1,10 @@
-package com.growup.econtry;
+package com.growup.ecountry;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EcontryApplicationTests {
+class EcountryApplicationTests {
 
 	@Test
 	void contextLoads() {
