@@ -1,11 +1,17 @@
 package com.growup.ecountry.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Countries {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +36,7 @@ public class Countries {
     private Integer treasury;
 
     @Column(nullable = false)
-    private Integer salary_date;
+    private Integer salaryDate;
 
     @ManyToOne
     @JoinTable(name = "user_id")
