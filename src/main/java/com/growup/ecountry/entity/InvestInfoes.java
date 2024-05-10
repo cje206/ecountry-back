@@ -21,6 +21,13 @@ public class InvestInfoes {
     private String unit;
 
     @ManyToOne
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "country_id", insertable=false, updatable=false)
     private Countries countries;
+
+    @Column(name = "country_id")
+    private Long countryId;
+
+    public InvestInfoes(Long countryId) {
+        this.countryId = countryId;
+    }
 }

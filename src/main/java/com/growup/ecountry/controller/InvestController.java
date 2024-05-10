@@ -1,17 +1,14 @@
 package com.growup.ecountry.controller;
 
+import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.InvestDTO;
-import com.growup.ecountry.dto.UserDTO;
-import com.growup.ecountry.entity.Invests;
 import com.growup.ecountry.service.InvestService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.lang.model.type.NullType;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/invest")
@@ -19,23 +16,15 @@ import java.util.stream.Collectors;
 public class InvestController {
     private final InvestService investService;
 
-    @PostMapping("/set")
-    public ResponseEntity<List<Invests>> setInvest(@RequestBody List<InvestDTO> investDTOs) {
-        for(InvestDTO invest : investDTOs) {
-            investService.create(invest);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+    @PostMapping
+//    public ResponseEntity<ApiResponseDTO<NullType>> setInvest(@RequestBody List<InvestDTO> investDTOs) {
+//        investService.create(investDTOs);
+//        return ResponseEntity.ok(new ApiResponseDTO<NullType>(true, "투자 항목 생성 완료", null));
+//    }
 
     @GetMapping("/{countryId}")
     public ResponseEntity<List<InvestDTO>> getInvest(@PathVariable Long countryId) {
         return ResponseEntity.ok(investService.getInvest(countryId));
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> postInvest(@RequestBody InvestDTO investDTO) {
-        investService.create(investDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{id}")

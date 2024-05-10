@@ -13,5 +13,5 @@ import java.util.List;
 public class ApiResponseDTO<T> {
     private Boolean success;
     private String message ;
-    private List<T> result = new ArrayList<>();
+    private T result;
 }
