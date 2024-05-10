@@ -3,6 +3,9 @@ package com.growup.ecountry.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -19,6 +22,13 @@ public class Invests {
 
     @Column(nullable = false)
     private String unit;
+
+    @Column
+    private String info;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "invests")
+    private List<InvestStatus> investStatus = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "country_id", insertable=false, updatable=false)

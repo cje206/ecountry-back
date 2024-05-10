@@ -23,6 +23,13 @@ public class InvestStatus {
     private Timestamp createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "country_id")
-    private Countries countries;
+    @JoinColumn(name = "invest_id", insertable=false, updatable=false)
+    private Invests invests;
+
+    @Column(name = "invest_id")
+    private Long investId;
+
+    public InvestStatus(Long investId) {
+        this.investId = investId;
+    }
 }
