@@ -19,7 +19,7 @@ public class InvestStatus {
     @Column(nullable = false)
     private Double status;
 
-    @Column(name = "registered",nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp createdAt;
 
     @ManyToOne
