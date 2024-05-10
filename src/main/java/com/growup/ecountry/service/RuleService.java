@@ -40,19 +40,6 @@ public class RuleService {
                         .build()).collect(Collectors.toList());
     }
 
-    //규칙 1개 추가
-    public Boolean addRule (RuleDTO ruleDTO){
-
-        Rules rule = Rules.builder().countryId(ruleDTO.getCountryId()).rule(ruleDTO.getRule()).build();
-
-        try {
-            ruleRepository.save(rule);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return false;
-        }
-        return true;
-    }
     //규칙 삭제
     public Boolean deleteRules(Long id){
         try {
@@ -66,8 +53,6 @@ public class RuleService {
     }
     // 규칙 수정
     public Boolean updateRule (RuleDTO ruleDTO){
-
-
 
         try {
             Rules rule = ruleRepository.findById(ruleDTO.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 규칙아이디 입니다."));
