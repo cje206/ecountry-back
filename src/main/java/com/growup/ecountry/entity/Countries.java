@@ -53,4 +53,8 @@ public class Countries {
     @Builder.Default
     @OneToMany(mappedBy = "countries")
     private List<Invests> invests = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "countries")
+    private List<Taxes> taxes = new ArrayList<>();
 }
