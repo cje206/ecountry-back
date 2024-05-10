@@ -1,17 +1,15 @@
 package com.growup.ecountry.controller;
 
+import com.growup.ecountry.dto.ResponseDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/admin/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -21,8 +19,16 @@ public class UserController {
         return ResponseEntity.ok(userService.create(userDTO));
     }
 
+    //UserDTO 타입 → ResponseDTO 타입 + Security에서 제공하는 Login 기능 써야됨..
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestBody String userId, @RequestBody String pw) {
-        return ResponseEntity.ok(userService.findByUserIdAndPw(userId, pw));
+    public ResponseEntity<ResponseDTO> login(@RequestBody UserDTO userDTO) {
+            //success + message 반환
+            return ResponseEntity.ok(userService.findByUserIdAndPw(userDTO));
+    }
+    //@PutMapping("/change")
+
+    @PutMapping
+    public ResponseEntity<ResponseDTO> imgUpdate(@RequestBody UserDTO userDTO){
+        return ResponseEntity.ok(userService.imgUpdateService(userDTO));
     }
 }
