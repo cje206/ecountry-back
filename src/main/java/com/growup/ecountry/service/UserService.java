@@ -22,9 +22,7 @@ public class UserService {
     private final TokenProvider jwt;
 
 //    private final PasswordEncoder passwordEncoder;
-
     public Users create(UserDTO userDTO) {
-        System.out.println("create");
 //        String encryptionPassword = passwordEncoder.encode(userDTO.getPw());
         Users user = Users.builder()
                 .name(userDTO.getName())
@@ -33,7 +31,6 @@ public class UserService {
         return  userRepository.save(user);
     }
 
-    //UserDTO 타입 → ResponseDTO 타입
     public ApiResponseDTO<String> findByUserIdAndPw(UserDTO userDTO) {
         Optional<Users> userExist = userRepository.findByUserIdAndPw(userDTO.getUserId(), userDTO.getPw());
         if(userExist.isPresent()){
@@ -45,13 +42,13 @@ public class UserService {
         }
     }
 
-    public ResponseDTO imgUpdateService(UserDTO userDTO){
+    public ApiResponseDTO<NullPointerException> imgUpdateService(UserDTO userDTO){
         Optional<Users> userExist = userRepository.findById(userDTO.getId());
         if(userExist.isPresent()){
-            return new ResponseDTO(true,"이미지 변경 성공");
+            return new ApiResponseDTO(true,"이미지 변경 성공",null);
         }
         else {
-            return new ResponseDTO(false,"이미지 변경 실패");
+            return new ApiResponseDTO(false,"이미지 변경 실패",null);
         }
     }
 }

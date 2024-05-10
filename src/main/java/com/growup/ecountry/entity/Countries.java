@@ -32,10 +32,10 @@ public class Countries {
     @Column(nullable = false)
     private String unit;
 
-    @Column(nullable = false)
+    @Column( columnDefinition = "integer default 0")
     private Integer treasury;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "integer default 25")
     private Integer salaryDate;
 
     @ManyToOne

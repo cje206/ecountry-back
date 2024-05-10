@@ -1,18 +1,26 @@
 package com.growup.ecountry.config;
 
+import com.growup.ecountry.dto.UserDTO;
+import com.growup.ecountry.entity.Users;
+import com.growup.ecountry.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class TokenProvider {
+    private final UserRepository userRepository;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -46,10 +54,10 @@ public class TokenProvider {
         return extractExpiration(token).before(new Date());
     }
 
-    // 토큰 생성
-        public String generateToken(String userId) {
+    // 토큰 생성(userId로 만듬)
+        public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userId);
+        return createToken(claims, username);
     }
 
     // 실제 토큰 생성 로직
@@ -60,8 +68,17 @@ public class TokenProvider {
     }
 
     // 토큰 유효성 검사
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public String validateToken(String token) {
+        System.out.println(token);
+        String realToken[] = token.split(" ");
+        final String userid = extractUsername(realToken[1]);
+        Optional<Users> userExist = userRepository.findByUserId(userid);
+        if(userExist.isPresent()){
+           return userid;
+        }
+        else{
+            return "false";
+        }
     }
 }
+// return (username.equals(user.getUserId()) && !isTokenExpired(token));

@@ -29,8 +29,8 @@ public class UserController {
     }
     //@PutMapping("/change")
 
-    @PutMapping
-    public ResponseEntity<ResponseDTO> imgUpdate(@RequestBody UserDTO userDTO){
-        return ResponseEntity.ok(userService.imgUpdateService(userDTO));
-    }
+//    @PutMapping
+//    public ResponseEntity<ResponseDTO> imgUpdate(@RequestBody UserDTO userDTO){
+//        return ResponseEntity.ok(userService.imgUpdateService(userDTO));
+//    }
 }
