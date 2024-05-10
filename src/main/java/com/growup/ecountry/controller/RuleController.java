@@ -27,8 +27,8 @@ public class RuleController {
         return ResponseEntity.ok(new ApiResponseDTO<NullType>(result, msg,null));
     }
     //규칙리스트 조회
-    @GetMapping
-    public ResponseEntity<FindAllRuleResponse> findAllRules(@RequestParam Long countryId){
+    @GetMapping("/{countryId}")
+    public ResponseEntity<FindAllRuleResponse> findAllRules(@PathVariable Long countryId){
         List<RuleDTO> ruleDTOList = ruleService.findAllRules(countryId);
         String msg = ruleDTOList != null ? "규칙조회에 성공하였습니다." : "규칙조회에 실패하였습니다.";
         Boolean success = false;
@@ -47,8 +47,8 @@ public class RuleController {
     }
 
     //규칙 삭제
-    @DeleteMapping
-    public ResponseEntity<ApiResponseDTO<NullType>> deleteRule(@RequestParam long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<NullType>> deleteRule(@PathVariable long id){
         Boolean result = ruleService.deleteRules(id);
         String msg = result ? "규칙삭제에 성공하였습니다." : "규칙삭제에 실패하였습니다.";
 
