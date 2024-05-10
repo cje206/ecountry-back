@@ -1,10 +1,8 @@
 package com.growup.ecountry.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.growup.ecountry.ApiResponse;
-import com.growup.ecountry.ApiResponseSimple;
+import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.RuleDTO;
-import com.growup.ecountry.entity.Rules;
 import com.growup.ecountry.service.RuleService;
 import lombok.*;
 import org.springframework.http.ResponseEntity;
@@ -72,14 +70,14 @@ public class RuleController {
     }
 
     //규칙세팅,추가,업데이트, 삭제 응답
-    static class RuleResponse extends ApiResponseSimple {
+    static class RuleResponse extends ApiResponseDTO {
 
         public RuleResponse(Boolean success, String message) {
-            super(success, message);
+            super(success, message, null);
         }
     }
     //규칙리스트 정보 응답
-    static class FindAllRuleResponse  extends ApiResponse<FindedAllRules>{
+    static class FindAllRuleResponse  extends ApiResponseDTO<FindedAllRules>{
 
         @Builder
         public FindAllRuleResponse(Boolean success, String message, List<FindedAllRules> findedAllRulesList) {
