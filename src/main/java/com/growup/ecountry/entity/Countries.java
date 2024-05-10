@@ -39,12 +39,18 @@ public class Countries {
     private Integer salaryDate;
 
     @ManyToOne
-    @JoinTable(name = "user_id")
+    @JoinColumn(name = "user_id")
     private Users users;
 
+    @Builder.Default
     @OneToMany(mappedBy = "countries")
     private List<Students> students = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "countries")
     private List<Rules> rules = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "countries")
+    private List<Invests> invests = new ArrayList<>();
 }
