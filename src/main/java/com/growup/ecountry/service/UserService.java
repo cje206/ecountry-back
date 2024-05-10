@@ -1,5 +1,6 @@
 package com.growup.ecountry.service;
 
+import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ResponseDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Users;
@@ -14,6 +15,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private TokenProvider jwt;
+
 //    private final PasswordEncoder passwordEncoder;
 
     public Users create(UserDTO userDTO) {
@@ -29,7 +32,8 @@ public class UserService {
     public ResponseDTO findByUserIdAndPw(UserDTO userDTO) {
         Optional<Users> userExist = userRepository.findByUserIdAndPw(userDTO.getUserId(), userDTO.getPw());
         if(userExist.isPresent()){
-            return new ResponseDTO(true,"로그인 성공");
+            String token = jwt.generateToken(userDTO.getUserId());
+            return new ApiResponseDTO(true,"로그인 성공",token);
         }
         else {
             return new ResponseDTO(false,"아이디 혹은 비밀번호를 잘못 입력하셨습니다");
