@@ -18,7 +18,7 @@ public class RuleController {
     public final RuleService ruleService;
 
     //규칙리스트 등록
-    @PostMapping("/set")
+    @PostMapping
     public ResponseEntity<RuleResponse> createRules(@RequestBody List<RuleDTO> ruleDTOList){
         Boolean result = ruleService.setRules(ruleDTOList);
         String msg = result ? "규칙생성에 성공하였습니다." : "규칙생성에 실패하였습니다.";
@@ -42,16 +42,6 @@ public class RuleController {
         return ResponseEntity.ok(hello);
     }
 
-
-    //규칙 1개 추가
-    @PostMapping
-    public ResponseEntity<RuleResponse> addRule(@RequestBody RuleDTO ruleDTO){
-        //rule이없으면 디비 저장이 안되나 country_id가 없어도 저장되어서 값이 있어야 저장되도록 설정
-        Boolean result = ruleDTO.getCountryId() != null && ruleService.addRule(ruleDTO);
-        String msg = result ? "규칙생성에 성공하였습니다." : "규칙생성에 실패하였습니다.";
-
-        return ResponseEntity.ok(new RuleResponse(result, msg));
-    }
     //규칙 삭제
     @DeleteMapping
     public ResponseEntity<RuleResponse> deleteRule(@RequestParam long id){
