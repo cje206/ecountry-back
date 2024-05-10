@@ -10,8 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 
-    public class ApiResponseDTO<T> {
-        private Boolean success;
-        private String message ;
-        private T result;
-    }
+public class ApiResponseDTO<T> {
+    private Boolean success;
+    private String message;
+    private T result;
+}

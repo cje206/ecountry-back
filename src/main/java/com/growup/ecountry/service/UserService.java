@@ -2,7 +2,6 @@ package com.growup.ecountry.service;
 
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
-import com.growup.ecountry.dto.ResponseDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.repository.UserRepository;

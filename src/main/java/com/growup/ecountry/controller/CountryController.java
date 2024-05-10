@@ -3,7 +3,6 @@ package com.growup.ecountry.controller;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
-import com.growup.ecountry.dto.ResponseDTO;
 import com.growup.ecountry.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

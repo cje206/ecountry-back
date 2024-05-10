@@ -1,7 +1,6 @@
 package com.growup.ecountry.controller;
 
 import com.growup.ecountry.dto.ApiResponseDTO;
-import com.growup.ecountry.dto.ResponseDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.service.UserService;

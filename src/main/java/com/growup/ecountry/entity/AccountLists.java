@@ -3,32 +3,31 @@ package com.growup.ecountry.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Invests {
+public class AccountLists {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(columnDefinition = "TINYINT(1) default 1", nullable = false)
+    private boolean division;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private String unit;
+    private Double interest;
 
-    @Column
-    private String info;
+    @Column(nullable = false)
+    private Integer dueDate;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "invests")
-    private List<InvestStatus> investStatus = new ArrayList<>();
+    @Column(columnDefinition = "TINYINT(1) default 1", nullable = false)
+    private boolean available;
 
     @ManyToOne
     @JoinColumn(name = "country_id", insertable=false, updatable=false)
@@ -37,7 +36,7 @@ public class Invests {
     @Column(name = "country_id")
     private Long countryId;
 
-    public Invests(Long countryId) {
+    public AccountLists(Long countryId) {
         this.countryId = countryId;
     }
 }
