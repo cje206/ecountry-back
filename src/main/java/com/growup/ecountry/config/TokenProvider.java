@@ -28,8 +28,8 @@ public class TokenProvider {
     @Value("${jwt.expiration}")
     private int expiration;
 
-    // 토큰에서 username을 추출
-    public String extractUsername(String token) {
+    // 토큰에서 userId을 추출
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -55,9 +55,9 @@ public class TokenProvider {
     }
 
     // 토큰 생성(userId로 만듬)
-        public String generateToken(String username) {
+        public String generateToken(String userId) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, userId);
     }
 
     // 실제 토큰 생성 로직
@@ -71,7 +71,7 @@ public class TokenProvider {
     public String validateToken(String token) {
         System.out.println(token);
         String realToken[] = token.split(" ");
-        final String userid = extractUsername(realToken[1]);
+        final String userid = extractUserId(realToken[1]);
         Optional<Users> userExist = userRepository.findByUserId(userid);
         if(userExist.isPresent()){
            return userid;

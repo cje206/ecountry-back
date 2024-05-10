@@ -2,6 +2,8 @@ package com.growup.ecountry.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
 @Builder
 public class Countries {
     @Id
@@ -32,10 +35,10 @@ public class Countries {
     @Column(nullable = false)
     private String unit;
 
-    @Column( columnDefinition = "integer default 0")
+    @ColumnDefault("0")
     private Integer treasury;
 
-    @Column(columnDefinition = "integer default 25")
+    @ColumnDefault("25")
     private Integer salaryDate;
 
     @ManyToOne

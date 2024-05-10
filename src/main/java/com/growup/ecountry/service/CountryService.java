@@ -3,13 +3,18 @@ package com.growup.ecountry.service;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
+import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Countries;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.repository.CountryRepository;
 import com.growup.ecountry.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import javax.lang.model.type.NullType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,31 +23,28 @@ public class CountryService {
     private final CountryRepository countryRepository;
     private final UserRepository userRepository;
     private final TokenProvider jwt;
-    //국가정보
-    public CountryDTO countryDataService(Long country_id){
-        Optional<Countries> countryExist = countryRepository.findById(country_id);
-        if(countryExist.isPresent()){
-            Countries countries = countryExist.get();
-            CountryDTO countryDTO =
-                    CountryDTO.builder()
-                            .school(countries.getSchool())
-                            .name(countries.getName())
-                            .grade(countries.getGrade())
-                            .classroom(countries.getClassroom())
-                            .unit(countries.getUnit())
-                            .treasury(countries.getTreasury())
-                            .salaryDate(countries.getSalaryDate()).build();
-            return countryDTO;
+
+    //국가정보 조회
+    public ApiResponseDTO<CountryDTO> findCountries(Long countryId) {
+        Optional<Countries> countryExist = countryRepository.findById(countryId);
+        if (countryExist.isPresent()) {
+            Countries country = countryExist.get();
+            CountryDTO countryDTO = CountryDTO.builder()
+                    .school(country.getSchool())
+                    .name(country.getName())
+                    .grade(country.getGrade())
+                    .classroom(country.getClassroom())
+                    .unit(country.getUnit())
+                    .treasury(country.getTreasury())
+                    .salaryDate(country.getSalaryDate()).build();
+            return new ApiResponseDTO<>(true, "국가 리스트 조회 성공", countryDTO);
         } else {
-            return new CountryDTO();
+            return new ApiResponseDTO<>(false, "국가 리스트가 없습니다.", null);
         }
     }
-    // 아래 목록 전부 jwt 토큰을 id로 변환하는 로직 및 새 ResponseDTO 클래스 필요
-
-    //국가생성
-    // ResponseDTO: 새 응답 DTO 필요
-     public ApiResponseDTO create(CountryDTO countryDTO, String username){
-        Optional<Users> user = userRepository.findByUserId(username);
+    //국가등록
+     public ApiResponseDTO<NullType> create(CountryDTO countryDTO, String userId){
+        Optional<Users> user = userRepository.findByUserId(userId);
          System.out.print(user);
         if(user.isPresent()){
             Users users = user.get();
@@ -54,20 +56,47 @@ public class CountryService {
                     .unit(countryDTO.getUnit())
                     .users(users).build();
             countryRepository.save(countries);
-            return  new ApiResponseDTO(true,"국가 생성 완료","");
+            return  new ApiResponseDTO<>(true,"국가 생성 완료",null);
         }
         else {
-            return  new ApiResponseDTO(false,"국가 생성 실패","");
+            return  new ApiResponseDTO<>(false,"국가 생성 실패",null);
         }
     }
 
-    //국가 리스트 조회
-
-    // ResponseDTO: 새 응답 DTO 필요
-    // public CountryDTO searchList(String token){
-    // }
-
-    //국가 삭제(얘는 DTO 불필요)
-    //  public ResponseDTO delete(String token){
-    //  }
+    //국가리스트 조회
+     public ApiResponseDTO<List<CountryDTO>> findCountryList(String token){
+        String userId = jwt.validateToken(token);
+        if(userId != "false"){
+            Optional<Users> userExist =  userRepository.findByUserId(userId);
+            List<CountryDTO> countryDTOList = new ArrayList<>();
+            if(userExist.isPresent()){
+                Users user = userExist.get();
+                List<Countries> countries = countryRepository.findAllByUsers_Id(user.getId());
+                for(Countries country : countries){
+                    CountryDTO countryDTO =
+                            CountryDTO.builder()
+                                    .school(country.getSchool())
+                                    .name(country.getName())
+                                    .grade(country.getGrade())
+                                    .classroom(country.getClassroom())
+                                    .unit(country.getUnit())
+                                    .treasury(country.getTreasury())
+                                    .salaryDate(country.getSalaryDate()).build();
+                    countryDTOList.add(countryDTO);
+                }
+                return new ApiResponseDTO<>(true,"국가목록 조회 성공",countryDTOList);
+            }
+            else {
+                return new ApiResponseDTO<>(false,"유저 데이터를 찾을 수 없습니다",null);
+            }
+         }
+        else{
+            return new ApiResponseDTO<>(false,"국가목록 조회 실패",null);
+        }
+     }
+    //국가삭제
+      public ApiResponseDTO<NullType> delete(Long id){
+        countryRepository.deleteById(id);
+        return new ApiResponseDTO<>(true,"국가 삭제 성공",null);
+      }
 }
