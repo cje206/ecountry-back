@@ -3,16 +3,13 @@ package com.growup.ecountry.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Users {
+public class InvestInfoes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,16 +18,9 @@ public class Users {
     private String name;
 
     @Column(nullable = false)
-    private String userId;
+    private String unit;
 
-    @Column(nullable = false)
-    private String pw;
-
-    private String img;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users")
-    private List<Countries> countries = new ArrayList<>();
-
-
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Countries countries;
 }
