@@ -4,12 +4,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @Builder
-public class InvestInfoDTO {
+public class InvestStatusDTO {
     private Long id;
-    private String name;
-    private String unit;
-    private Long countryId;
+    private Double status;
+    private Timestamp createdAt;
+    private Long investId;
 }
