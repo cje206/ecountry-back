@@ -1,12 +1,14 @@
 package com.growup.ecountry.service;
 
 import com.growup.ecountry.config.TokenProvider;
+import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.ResponseDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,11 +17,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private TokenProvider jwt;
+
+    @Autowired
+    private final TokenProvider jwt;
 
 //    private final PasswordEncoder passwordEncoder;
 
     public Users create(UserDTO userDTO) {
+        System.out.println("create");
 //        String encryptionPassword = passwordEncoder.encode(userDTO.getPw());
         Users user = Users.builder()
                 .name(userDTO.getName())
@@ -29,14 +34,14 @@ public class UserService {
     }
 
     //UserDTO 타입 → ResponseDTO 타입
-    public ResponseDTO findByUserIdAndPw(UserDTO userDTO) {
+    public ApiResponseDTO<String> findByUserIdAndPw(UserDTO userDTO) {
         Optional<Users> userExist = userRepository.findByUserIdAndPw(userDTO.getUserId(), userDTO.getPw());
         if(userExist.isPresent()){
             String token = jwt.generateToken(userDTO.getUserId());
-            return new ApiResponseDTO(true,"로그인 성공",token);
+            return new ApiResponseDTO<>(true,"로그인 성공",token );
         }
         else {
-            return new ResponseDTO(false,"아이디 혹은 비밀번호를 잘못 입력하셨습니다");
+            return new ApiResponseDTO<>(false,"아이디 혹은 비밀번호를 잘못 입력하셨습니다","");
         }
     }
 
