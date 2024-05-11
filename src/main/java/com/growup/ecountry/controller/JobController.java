@@ -31,7 +31,7 @@ public class JobController {
         boolean success = jobService.addJob(jobRequestDataList);
         String msg = success ? "직업리스트 등록에 성공하였습니다. " : "직업리스트 등록에 실패하였습니다.";
 
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg, null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
 
     //직업리스트 조회
@@ -45,7 +45,7 @@ public class JobController {
     public ResponseEntity<ApiResponseDTO<NullType>> deleteJob(@PathVariable Long id){
         boolean success = jobService.deleteJob(id);
         String msg = success ? "직업리스트 1개 삭제에 성공하였습니다." : "직업리스트 1개 삭제에 실패하였습니다.";
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success,msg,null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success,msg));
 
     }
 
@@ -54,7 +54,7 @@ public class JobController {
     public ResponseEntity<ApiResponseDTO<NullType>> deleteJobDetail(@PathVariable Long id) {
         boolean success = jobService.deleteJobDetail(id);
         String msg = success ? "직업부가기능 1개 삭제에 성공하였습니다." : "직업부가기능 1개 삭제에 실패하였습니다.";
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg, null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
 
     //직업리스트 1개 수정
@@ -62,14 +62,14 @@ public class JobController {
     public ResponseEntity<ApiResponseDTO<NullType>> updateJob(@RequestBody JobDTO jobDTO){
         boolean success = jobService.updateJob(jobDTO);
         String msg = success ? "직업리스트 1개 수정에 성공하였습니다." : "직업리스트 1개 수정에 실패하였습니다.";
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg, null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
     //직업부가기능 1개 수정
     @PatchMapping("/detail")
     public ResponseEntity<ApiResponseDTO<NullType>> updateJobDetail(@RequestBody JobDetailDTO jobDetailDTO){
         boolean success = jobService.updateJobDetail(jobDetailDTO);
         String msg = success ? "직업부가기능 1개 수정에 성공하였습니다." : "직업부가기능 1개 수정에 실패하였습니다.";
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg, null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
 
 
