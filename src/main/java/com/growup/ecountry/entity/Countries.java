@@ -60,4 +60,8 @@ public class Countries {
     @Builder.Default
     @OneToMany(mappedBy = "countries")
     private List<Taxes> taxes = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "countries")
+    private List<Seats> seats = new ArrayList<>();
 }
