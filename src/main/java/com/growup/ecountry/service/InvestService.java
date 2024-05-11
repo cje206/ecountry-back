@@ -58,10 +58,9 @@ public class InvestService {
     }
 
     public InvestStatus addStatus(InvestStatusDTO investStatusDTO) {
-        InvestStatus status = InvestStatus.builder()
+        return investStatusRepository.save(InvestStatus.builder()
                 .status(investStatusDTO.getStatus())
-                .investId(investStatusDTO.getInvestId()).build();
-        return investStatusRepository.save(status);
+                .investId(investStatusDTO.getInvestId()).build());
     }
 
     public void deleteStatus(Long id) {
