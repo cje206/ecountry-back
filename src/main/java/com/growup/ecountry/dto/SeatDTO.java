@@ -7,10 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class InvestDTO {
+public class SeatDTO {
     private Long id;
-    private String name;
-    private String unit;
-    private String info;
+    private Integer rowNum;
+    private Integer colNum;
     private Long countryId;
 }

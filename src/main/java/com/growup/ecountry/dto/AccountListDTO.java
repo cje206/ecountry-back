@@ -7,10 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class InvestDTO {
+public class AccountListDTO {
     private Long id;
+    private boolean division;
     private String name;
-    private String unit;
-    private String info;
+    private Double interest;
+    private Integer dueDate;
+    private boolean available;
     private Long countryId;
 }
