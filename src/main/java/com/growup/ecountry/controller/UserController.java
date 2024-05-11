@@ -58,9 +58,9 @@ public class UserController {
     }
 
     //국가리스트조회
-    @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<CountryDTO>>> findCountryList(@RequestHeader(value = "Authorization") String token){
-        return ResponseEntity.ok(userService.findCountryList(token));
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<List<CountryDTO>>> findCountryList(@PathVariable Long id){
+        return ResponseEntity.ok(userService.findCountryList(id));
     }
 
     static class Token{
