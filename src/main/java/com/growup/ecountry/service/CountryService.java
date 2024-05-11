@@ -63,37 +63,6 @@ public class CountryService {
         }
     }
 
-    //국가리스트 조회
-     public ApiResponseDTO<List<CountryDTO>> findCountryList(String token){
-        String userId = jwt.validateToken(token);
-        if(userId != "false"){
-            Optional<Users> userExist =  userRepository.findByUserId(userId);
-            List<CountryDTO> countryDTOList = new ArrayList<>();
-            if(userExist.isPresent()){
-                Users user = userExist.get();
-                List<Countries> countries = countryRepository.findAllByUsers_Id(user.getId());
-                for(Countries country : countries){
-                    CountryDTO countryDTO =
-                            CountryDTO.builder()
-                                    .school(country.getSchool())
-                                    .name(country.getName())
-                                    .grade(country.getGrade())
-                                    .classroom(country.getClassroom())
-                                    .unit(country.getUnit())
-                                    .treasury(country.getTreasury())
-                                    .salaryDate(country.getSalaryDate()).build();
-                    countryDTOList.add(countryDTO);
-                }
-                return new ApiResponseDTO<>(true,"국가목록 조회 성공",countryDTOList);
-            }
-            else {
-                return new ApiResponseDTO<>(false,"유저 데이터를 찾을 수 없습니다",null);
-            }
-         }
-        else{
-            return new ApiResponseDTO<>(false,"국가목록 조회 실패",null);
-        }
-     }
     //국가삭제
       public ApiResponseDTO<NullType> delete(Long id){
         countryRepository.deleteById(id);

@@ -35,11 +35,6 @@ public class CountryController {
             return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 생성 실패",null));
          }
      }
-    //국가리스트조회
-     @GetMapping
-     public ResponseEntity<ApiResponseDTO<List<CountryDTO>>> findCountryList(@RequestHeader(value = "Authorization") String token){
-        return ResponseEntity.ok(countryService.findCountryList(token));
-     }
 
     //국가삭제
      @DeleteMapping("/{id}")

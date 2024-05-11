@@ -3,6 +3,7 @@ package com.growup.ecountry.controller;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
+import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.service.UserService;
@@ -46,12 +47,20 @@ public class UserController {
         }
         return ResponseEntity.ok(new ApiResponseDTO<>(false,"비밀번호 변경에 실패하였습니다",null));
     }
+
+
     //이미지 변경
     @PatchMapping
     public ResponseEntity<ApiResponseDTO<NullType>> imgUpdate(@RequestBody UserDTO userDTO){
         Boolean result = userService.imgUpdate(userDTO);
         String msg = result ? "이미지 변경에 성공하였습니다" : "이미지 변경에 실패하였습니다";
         return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
+    }
+
+    //국가리스트조회
+    @GetMapping
+    public ResponseEntity<ApiResponseDTO<List<CountryDTO>>> findCountryList(@RequestHeader(value = "Authorization") String token){
+        return ResponseEntity.ok(userService.findCountryList(token));
     }
 
     static class Token{

@@ -2,8 +2,11 @@ package com.growup.ecountry.service;
 
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
+import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.dto.UserDTO;
+import com.growup.ecountry.entity.Countries;
 import com.growup.ecountry.entity.Users;
+import com.growup.ecountry.repository.CountryRepository;
 import com.growup.ecountry.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,12 +15,15 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.lang.model.type.NullType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final CountryRepository countryRepository;
     private final TokenProvider jwt;
 //    private final PasswordEncoder passwordEncoder;
 
@@ -86,6 +92,37 @@ public class UserService {
         }
         else {
             return false;
+        }
+    }
+    //국가리스트 조회
+    public ApiResponseDTO<List<CountryDTO>> findCountryList(String token){
+        String userId = jwt.validateToken(token);
+        if(userId != "false"){
+            Optional<Users> userExist =  userRepository.findByUserId(userId);
+            List<CountryDTO> countryDTOList = new ArrayList<>();
+            if(userExist.isPresent()){
+                Users user = userExist.get();
+                List<Countries> countries = countryRepository.findAllByUsers_Id(user.getId());
+                for(Countries country : countries){
+                    CountryDTO countryDTO =
+                            CountryDTO.builder()
+                                    .school(country.getSchool())
+                                    .name(country.getName())
+                                    .grade(country.getGrade())
+                                    .classroom(country.getClassroom())
+                                    .unit(country.getUnit())
+                                    .treasury(country.getTreasury())
+                                    .salaryDate(country.getSalaryDate()).build();
+                    countryDTOList.add(countryDTO);
+                }
+                return new ApiResponseDTO<>(true,"국가목록 조회 성공",countryDTOList);
+            }
+            else {
+                return new ApiResponseDTO<>(false,"유저 데이터를 찾을 수 없습니다",null);
+            }
+        }
+        else{
+            return new ApiResponseDTO<>(false,"국가목록 조회 실패",null);
         }
     }
 }
