@@ -95,17 +95,16 @@ public class UserService {
         }
     }
     //국가리스트 조회
-    public ApiResponseDTO<List<CountryDTO>> findCountryList(String token){
-        String userId = jwt.validateToken(token);
-        if(userId != "false"){
-            Optional<Users> userExist =  userRepository.findByUserId(userId);
-            List<CountryDTO> countryDTOList = new ArrayList<>();
+    public ApiResponseDTO<List<CountryDTO>> findCountryList(Long id){
+            Optional<Users> userExist =  userRepository.findById(id);
+            List<CountryDTO> userCountryDTOList = new ArrayList<>();
             if(userExist.isPresent()){
                 Users user = userExist.get();
                 List<Countries> countries = countryRepository.findAllByUsers_Id(user.getId());
                 for(Countries country : countries){
                     CountryDTO countryDTO =
                             CountryDTO.builder()
+                                    .id(country.getId())
                                     .school(country.getSchool())
                                     .name(country.getName())
                                     .grade(country.getGrade())
@@ -113,16 +112,12 @@ public class UserService {
                                     .unit(country.getUnit())
                                     .treasury(country.getTreasury())
                                     .salaryDate(country.getSalaryDate()).build();
-                    countryDTOList.add(countryDTO);
+                    userCountryDTOList.add(countryDTO);
                 }
-                return new ApiResponseDTO<>(true,"국가목록 조회 성공",countryDTOList);
+                return new ApiResponseDTO<>(true,"국가목록 조회 성공",userCountryDTOList);
             }
             else {
                 return new ApiResponseDTO<>(false,"유저 데이터를 찾을 수 없습니다",null);
-            }
-        }
-        else{
-            return new ApiResponseDTO<>(false,"국가목록 조회 실패",null);
         }
     }
 }
