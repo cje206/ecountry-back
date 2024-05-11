@@ -2,12 +2,15 @@ package com.growup.ecountry.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
 @Builder
 public class Students {
     @Id
@@ -23,13 +26,19 @@ public class Students {
     @Column(nullable = false)
     private String pw;
 
-    @Column(nullable = false)
+    @ColumnDefault("5")
     private Integer rating;
 
-    @Column(nullable = false)
     private String img;
 
     @ManyToOne
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "country_id",insertable=false, updatable=false)
     private Countries countries;
+
+    @Column(name = "country_id")
+    private Long countryId;
+
+    public Students(Long countryId) {
+        this.countryId = countryId;
+    }
 }

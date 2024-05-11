@@ -28,7 +28,7 @@ public class TokenProvider {
     @Value("${jwt.expiration}")
     private int expiration;
 
-    // 토큰에서 userId을 추출
+    // 토큰에서 userId을 추출 1
     public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -60,14 +60,14 @@ public class TokenProvider {
         return createToken(claims, userId);
     }
 
-    // 실제 토큰 생성 로직
+    // 실제 토큰 생성 로직 2
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
     }
 
-    // 토큰 유효성 검사
+    // 토큰 유효성 검사 3
     public String validateToken(String token) {
         System.out.println(token);
         String realToken[] = token.split(" ");
