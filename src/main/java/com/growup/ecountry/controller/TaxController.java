@@ -27,7 +27,7 @@ public class TaxController {
         Boolean success = taxService.addTaxes(taxDTOList);
         String msg = success ? "세금리스트 추가에 성공하였습니다." : "세금리스트 추가에 실패하였습니다.";
 
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success,msg,null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success,msg));
     }
     //세금리스트 조회
     @GetMapping("/{countryId}")
@@ -54,7 +54,7 @@ public class TaxController {
         Boolean success = taxService.deleteTax(id);
         String msg = success ? "세금리스트 1개 삭제에 성공하였습니다." : "세금리스트 1개 삭제에 실패하였습니다.";
 
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg, null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
     //세금리스트 수정
     @PatchMapping
@@ -62,7 +62,7 @@ public class TaxController {
         Boolean success = taxService.updateTax(taxDTO);
         String msg = success ? "세금리스트 1개 수정에 성공하였습니다." : "세금리스트 1개 수정에 실패하였습니다.";
 
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg, null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
 
     static class FindAllTaxes{
