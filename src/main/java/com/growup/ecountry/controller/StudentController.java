@@ -9,8 +9,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.lang.model.type.NullType;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,12 @@ public class StudentController {
     public ResponseEntity<ApiResponseDTO<NullType>> studentAdd(@PathVariable Long countryId, @RequestBody List<StudentDTO> studentDTOS){
         return ResponseEntity.ok(studentService.studentAdd(countryId,studentDTOS));
     }
+    //국민등록(엑셀)
+    @PostMapping("add/{countryId}")
+    public ResponseEntity<ApiResponseDTO<NullType>> studentAddExcel(@PathVariable Long countryId, @RequestParam("file")MultipartFile file) throws IOException {
+        return ResponseEntity.ok(studentService.studentAddExcel(countryId,file));
+    }
+
     //국민조회
     @GetMapping("/{countryId}")
     public ResponseEntity<ApiResponseDTO<List<StudentData>>> studentList(@PathVariable Long countryId){

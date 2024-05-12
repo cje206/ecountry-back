@@ -2,6 +2,7 @@ package com.growup.ecountry.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter

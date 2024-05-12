@@ -20,7 +20,7 @@ public class Accounts {
     private Integer balance;
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createdAt;
+    private Long createdAt;
 
     @ManyToOne
     @JoinColumn(name = "student_id", insertable=false, updatable=false)
