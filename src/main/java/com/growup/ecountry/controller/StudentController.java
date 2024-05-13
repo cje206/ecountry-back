@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.StudentDTO;
+import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.service.StudentService;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,15 +62,15 @@ public class StudentController {
     @PostMapping("/user")
     public ResponseEntity<ApiResponseDTO<String>> studentLogin(@RequestBody StudentDTO studentDTO){
         ApiResponseDTO<Long> result = studentService.studentLogin(studentDTO);
-        Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult())) : new Token(null);
+        Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(),true)) : new Token(null);
         return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), token.getToken()));
     }
     //학생비밀번호 변경
     @PatchMapping("/user")
     public ResponseEntity<ApiResponseDTO<NullType>> studentPwUpdate(@RequestHeader("Authorization") String token,@RequestBody StudentDTO studentDTO){
-        Long authToken = jwt.validateToken(token);
-        if(authToken != 0) {
-            return ResponseEntity.ok(studentService.studentPwUpdate(authToken,studentDTO));
+        TokenDTO authToken = jwt.validateToken(token);
+        if(authToken != null) {
+            return ResponseEntity.ok(studentService.studentPwUpdate(authToken.getId(), studentDTO));
         }
         else {
             return ResponseEntity.ok(new ApiResponseDTO<>(false,"사용자 인증에 실패하였습니다",null));
