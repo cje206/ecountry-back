@@ -38,4 +38,9 @@ public class News {
 
     @Column(name = "writer_id")
     private Long writerId;
+
+    public News(Long writerId, Long countryId){
+        this.writerId = writerId;
+        this.countryId = countryId;
+    }
 }

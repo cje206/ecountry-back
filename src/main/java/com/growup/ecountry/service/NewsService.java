@@ -63,6 +63,23 @@ public class NewsService {
     }
 
     //뉴스 1개 추가
+    public Boolean addNews(NewsDTO newsDTO){
+        try{
+
+            News news = News.builder()
+                    .title(newsDTO.getTitle())
+                    .content(newsDTO.getContent())
+                    .writerId(newsDTO.getWriterId())
+                    .countryId(newsDTO.getCountryId())
+                    .build();
+
+            newsRepository.save(news);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+        return true;
+    }
 
     //뉴스 1개 삭제
     public Boolean deleteNews(Long id){
