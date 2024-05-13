@@ -1,5 +1,6 @@
 package com.growup.ecountry.config;
 
+import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.repository.UserRepository;
@@ -28,7 +29,7 @@ public class TokenProvider {
     @Value("${jwt.expiration}")
     private int expiration;
 
-    // 토큰에서 userId을 추출
+    // 토큰에서 id을 추출
     public String extractId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -54,35 +55,40 @@ public class TokenProvider {
         return extractExpiration(token).before(new Date());
     }
 
-    // 토큰 생성(userId로 만듬)
-        public String generateToken(Long id) {
+    // 토큰 생성(id로 만듬)
+        public String generateToken(Long id, Boolean isStudent) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, id);
+        String sub = String.valueOf(isStudent) + " " + String.valueOf(id);
+        return createToken(claims, sub);
     }
 
     // 실제 토큰 생성 로직
-    private String createToken(Map<String, Object> claims, Long id) {
-        System.out.println("토큰 생성 : " + id);
-        System.out.println("토큰 생성 : " + String.valueOf(id));
-        String token = Jwts.builder().setClaims(claims).setSubject(String.valueOf(id)).setIssuedAt(new Date(System.currentTimeMillis()))
+    private String createToken(Map<String, Object> claims, String sub) {
+        System.out.println("토큰 생성 : " + sub);
+        String token = Jwts.builder().setClaims(claims).setSubject(sub).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
         return token;
     }
 
     // 토큰 유효성 검사
-    public Long validateToken(String token) {
+    public TokenDTO validateToken(String token) {
         System.out.println("유효성 검사 : " + token);
         String[] realToken = token.split(" ");
         System.out.println("유효성 검사 : " + realToken[1]);
-        Long id = Long.valueOf(extractId(realToken[1]));
+        String[] val = extractId(realToken[1]).split(" ");
+        System.out.println("유효성 검사 : " + val[0]);
+        System.out.println("유효성 검사 : " + val[1]);
+
+        Boolean isStudent = (Boolean.parseBoolean(val[0]));
+        Long id = Long.valueOf(val[1]);
         System.out.println(id);
         Optional<Users> userExist = userRepository.findById(id);
         if(userExist.isPresent()){
-           return id;
+           return TokenDTO.builder().id(id).isStudent(isStudent).build();
         }
         else{
-            return 0L;
+            return null;
         }
     }
 }

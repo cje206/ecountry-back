@@ -3,6 +3,7 @@ package com.growup.ecountry.controller;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
+import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,9 @@ public class CountryController {
     //국가생성
      @PostMapping
      public ResponseEntity<ApiResponseDTO<NullType>> create(@RequestHeader(value = "Authorization") String token, @RequestBody CountryDTO countryDTO){
-         Long authToken = jwt.validateToken(token);
-         if(authToken != 0) {
-            return ResponseEntity.ok(countryService.create(countryDTO,authToken));
+         TokenDTO authToken = jwt.validateToken(token);
+         if(authToken.getId() != 0) {
+            return ResponseEntity.ok(countryService.create(countryDTO, authToken.getId()));
          }
          else {
             return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 생성 실패",null));
