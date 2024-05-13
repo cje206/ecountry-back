@@ -64,4 +64,8 @@ public class Countries {
     @Builder.Default
     @OneToMany(mappedBy = "countries")
     private List<Seats> seats = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "countries", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<News> news = new ArrayList<>();
 }
