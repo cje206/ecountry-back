@@ -45,8 +45,8 @@ public class CountryService {
         }
     }
     //국가등록
-     public ApiResponseDTO<NullType> create(CountryDTO countryDTO, String userId){
-        Optional<Users> user = userRepository.findByUserId(userId);
+     public ApiResponseDTO<NullType> create(CountryDTO countryDTO, Long id){
+        Optional<Users> user = userRepository.findById(id);
          System.out.print(user);
         if(user.isPresent()){
             Users users = user.get();
