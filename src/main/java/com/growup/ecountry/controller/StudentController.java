@@ -28,7 +28,7 @@ public class StudentController {
         return ResponseEntity.ok(studentService.studentAdd(countryId,studentDTOS));
     }
     //국민등록(엑셀)
-    @PostMapping("add/{countryId}")
+    @PostMapping("/add/{countryId}")
     public ResponseEntity<ApiResponseDTO<NullType>> studentAddExcel(@PathVariable Long countryId, @RequestParam("file")MultipartFile file) throws IOException {
         return ResponseEntity.ok(studentService.studentAddExcel(countryId,file));
     }
