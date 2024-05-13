@@ -3,6 +3,7 @@ package com.growup.ecountry.service;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
+import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.entity.Accounts;
 import com.growup.ecountry.entity.Countries;
@@ -184,4 +185,9 @@ public class StudentService {
             return new ApiResponseDTO<>(false,"국민이 존재하지 않습니다",null);
         }
     }
+    //알림조회
+    //알림추가
+//    public ApiResponseDTO<NullType> noticeAdd(NoticeDTO noticeDTO){
+//
+//    }
 }

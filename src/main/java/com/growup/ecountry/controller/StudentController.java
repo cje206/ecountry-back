@@ -3,6 +3,7 @@ package com.growup.ecountry.controller;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
+import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.service.StudentService;
@@ -81,6 +82,17 @@ public class StudentController {
     public ResponseEntity<ApiResponseDTO<NullType>> studentImgUpdate(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
         return ResponseEntity.ok(studentService.studentImgUpdate(countryId,studentDTO));
     }
+    //알림조회
+//    @GetMapping("/notice/{studentId}")
+//    public ResponseEntity<ApiResponseDTO> noticeCheck(@PathVariable Long studentId){
+//
+//    }
+    //알림추가
+//    @PostMapping("/notice/add")
+//    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@RequestBody NoticeDTO noticeDTO){
+//        return ResponseEntity.ok(studentService.noticeAdd(noticeDTO));
+//        return null;
+//    }
     static class StudentData {
         @JsonProperty
         private final Long id;
@@ -97,6 +109,7 @@ public class StudentController {
             this.rating = rating;
         }
     }
+
     //토큰 발급
     static class Token{
         @JsonProperty
