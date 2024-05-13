@@ -21,16 +21,10 @@ public class InvestService {
 
 //    투자 항목
     public List<Invests> createInvest(List<InvestDTO> investDTOS) {
-        List<Invests> invests = new ArrayList<>();
-        for (InvestDTO investDTO: investDTOS) {
-            Invests invest = Invests.builder()
-                    .name(investDTO.getName())
-                    .unit(investDTO.getUnit())
-                    .info(investDTO.getInfo())
-                    .countryId(investDTO.getCountryId())
-                    .build();
-            invests.add(invest);
-        }
+        List<Invests> invests = investDTOS.stream().map(investDTO -> Invests.builder()
+                .name(investDTO.getName()).unit(investDTO.getUnit())
+                .info(investDTO.getInfo()).countryId(investDTO.getCountryId())
+                .build()).collect(Collectors.toList());
         return investRepository.saveAll(invests);
     }
 

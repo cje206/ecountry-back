@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
+import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.dto.UserDTO;
-import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.service.UserService;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,17 +30,27 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponseDTO<String>> login(@RequestBody UserDTO userDTO) {
-        ApiResponseDTO<NullType> result = userService.login(userDTO);
-        Token token = result.getSuccess() ? new Token(jwt.generateToken(userDTO.getUserId()))
+        ApiResponseDTO<Long> result = userService.login(userDTO);
+        Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(), false))
                                           : new Token(null);
         return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), token.getToken()));
     }
 
+    @GetMapping("/auth")
+    public ResponseEntity<ApiResponseDTO<TokenDTO>> authUser(@RequestHeader(value = "Authorization") String token) {
+        TokenDTO authToken = jwt.validateToken(token);
+        if(authToken.getId() == 0) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "사용자 인증 실패", null));
+        } else {
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, "사용자 인증 완료", authToken));
+        }
+    }
+
     @PatchMapping("/change")
     public ResponseEntity<ApiResponseDTO<NullType>> pwUpdate(@RequestHeader(value= "Authorization") String token, @RequestBody UserDTO userDTO) {
-        String authToken = jwt.validateToken(token);
-        if(authToken != "false"){
-            Boolean result = userService.pwUpdate(authToken,userDTO.getPw());
+        TokenDTO authToken = jwt.validateToken(token);
+        if(authToken.getId() != 0){
+            Boolean result = userService.pwUpdate(authToken.getId(), userDTO.getPw());
             String msg = result ? "비밀번호를 성공적으로 변경하였습니다" : "비밀번호 변경에 실패하였습니다";
             return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
         }

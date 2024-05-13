@@ -25,9 +25,6 @@ public class JobController {
     //직업리스트 등록
     @PostMapping
     public ResponseEntity<ApiResponseDTO<NullType>> addJobs(@RequestBody List<JobRequestData> jobRequestDataList){
-        for(JobRequestData data : jobRequestDataList){
-            System.out.println(data.getSalary());
-        }
         boolean success = jobService.addJob(jobRequestDataList);
         String msg = success ? "직업리스트 등록에 성공하였습니다. " : "직업리스트 등록에 실패하였습니다.";
 

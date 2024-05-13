@@ -3,9 +3,10 @@ package com.growup.ecountry.service;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
-import com.growup.ecountry.dto.UserDTO;
+import com.growup.ecountry.entity.AccountLists;
 import com.growup.ecountry.entity.Countries;
 import com.growup.ecountry.entity.Users;
+import com.growup.ecountry.repository.AccountListRepository;
 import com.growup.ecountry.repository.CountryRepository;
 import com.growup.ecountry.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class CountryService {
     private final CountryRepository countryRepository;
     private final UserRepository userRepository;
+    private final AccountListRepository accountListRepository;
     private final TokenProvider jwt;
 
     //국가정보 조회
@@ -43,8 +45,8 @@ public class CountryService {
         }
     }
     //국가등록
-     public ApiResponseDTO<NullType> create(CountryDTO countryDTO, String userId){
-        Optional<Users> user = userRepository.findByUserId(userId);
+     public ApiResponseDTO<NullType> create(CountryDTO countryDTO, Long id){
+        Optional<Users> user = userRepository.findById(id);
          System.out.print(user);
         if(user.isPresent()){
             Users users = user.get();
