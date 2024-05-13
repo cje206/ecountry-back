@@ -1,7 +1,9 @@
 package com.growup.ecountry.config;
 
 import com.growup.ecountry.dto.UserDTO;
+import com.growup.ecountry.entity.Students;
 import com.growup.ecountry.entity.Users;
+import com.growup.ecountry.repository.StudentRepository;
 import com.growup.ecountry.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -21,6 +23,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class TokenProvider {
     private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -79,10 +82,14 @@ public class TokenProvider {
         Long id = Long.valueOf(extractId(realToken[1]));
         System.out.println(id);
         Optional<Users> userExist = userRepository.findById(id);
+        Optional<Students> studentExist = studentRepository.findById(id);
         if(userExist.isPresent()){
            return id;
         }
         else{
+            if(studentExist.isPresent()) {
+                return id;
+            }
             return 0L;
         }
     }
