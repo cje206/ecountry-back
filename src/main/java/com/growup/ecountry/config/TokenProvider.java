@@ -29,7 +29,7 @@ public class TokenProvider {
     private int expiration;
 
     // 토큰에서 userId을 추출
-    public String extractUserId(String token) {
+    public String extractId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -55,29 +55,34 @@ public class TokenProvider {
     }
 
     // 토큰 생성(userId로 만듬)
-        public String generateToken(String userId) {
+        public String generateToken(Long id) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userId);
+        return createToken(claims, id);
     }
 
     // 실제 토큰 생성 로직
-    private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+    private String createToken(Map<String, Object> claims, Long id) {
+        System.out.println("토큰 생성 : " + id);
+        System.out.println("토큰 생성 : " + String.valueOf(id));
+        String token = Jwts.builder().setClaims(claims).setSubject(String.valueOf(id)).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
+        return token;
     }
 
     // 토큰 유효성 검사
-    public String validateToken(String token) {
-        System.out.println(token);
-        String realToken[] = token.split(" ");
-        final String userid = extractUserId(realToken[1]);
-        Optional<Users> userExist = userRepository.findByUserId(userid);
+    public Long validateToken(String token) {
+        System.out.println("유효성 검사 : " + token);
+        String[] realToken = token.split(" ");
+        System.out.println("유효성 검사 : " + realToken[1]);
+        Long id = Long.valueOf(extractId(realToken[1]));
+        System.out.println(id);
+        Optional<Users> userExist = userRepository.findById(id);
         if(userExist.isPresent()){
-           return userid;
+           return id;
         }
         else{
-            return "false";
+            return 0L;
         }
     }
 }

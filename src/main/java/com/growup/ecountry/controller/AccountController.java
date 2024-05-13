@@ -18,25 +18,44 @@ public class AccountController {
 
     @PostMapping
     public ResponseEntity<ApiResponseDTO<NullType>> createList(@RequestBody AccountListDTO accountListDTO) {
-        accountService.createList(accountListDTO);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "적금 통장 추가 완료", null));
+        try {
+            accountService.createList(accountListDTO);
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, "적금 통장 추가 완료"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "적금 통장 추가 실패"));
+
+        }
     }
 
     @GetMapping("/{countryId}")
     public ResponseEntity<ApiResponseDTO<List<AccountListDTO>>> getList(@PathVariable Long countryId) {
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "개설 가능 적금 통장 조회 완료", accountService.getList(countryId, true, true)));
+        try {
+            List<AccountListDTO> result = accountService.getList(countryId, true, true);
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, "개설 가능 적금 통장 조회 완료", result));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "개설 가능 적금 통장 조회 실패"));
+        }
+
     }
 
     @PatchMapping
     public ResponseEntity<ApiResponseDTO<NullType>> updateList(@RequestBody AccountListDTO accountListDTO) {
-        accountService.updateList(accountListDTO);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "적금 통장 수정 완료", null));
+        try {
+            accountService.updateList(accountListDTO);
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, "적금 통장 수정 완료"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "적금 통장 수정 실패"));
+        }
     }
 
     @PatchMapping("/delete/{id}")
     public ResponseEntity<ApiResponseDTO<NullType>> disableList(@PathVariable Long id) {
-        accountService.disableList(id);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "적금 통장 비활성화 완료", null));
+        try {
+            accountService.disableList(id);
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, "적금 통장 비활성화 완료"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "적금 통장 비활성화 실패"));
+        }
     }
 
 }
