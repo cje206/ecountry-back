@@ -60,9 +60,9 @@ public class StudentController {
         return ResponseEntity.ok(studentService.studentUpdate(countryId,studentDTO));
     }
     //학생로그인
-    @PostMapping("/user")
-    public ResponseEntity<ApiResponseDTO<String>> studentLogin(@RequestBody StudentDTO studentDTO){
-        ApiResponseDTO<Long> result = studentService.studentLogin(studentDTO);
+    @PostMapping("/user/{countryId}")
+    public ResponseEntity<ApiResponseDTO<String>> studentLogin(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
+        ApiResponseDTO<Long> result = studentService.studentLogin(countryId,studentDTO);
         Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(),true)) : new Token(null);
         return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), token.getToken()));
     }
@@ -88,11 +88,10 @@ public class StudentController {
 //
 //    }
     //알림추가
-//    @PostMapping("/notice/add")
-//    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@RequestBody NoticeDTO noticeDTO){
-//        return ResponseEntity.ok(studentService.noticeAdd(noticeDTO));
-//        return null;
-//    }
+    @PostMapping("/notice/add")
+    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@RequestBody NoticeDTO noticeDTO){
+        return ResponseEntity.ok(studentService.noticeAdd(noticeDTO));
+    }
     static class StudentData {
         @JsonProperty
         private final Long id;
