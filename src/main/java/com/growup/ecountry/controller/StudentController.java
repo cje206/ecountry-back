@@ -16,7 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.lang.model.type.NullType;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -83,15 +85,29 @@ public class StudentController {
         return ResponseEntity.ok(studentService.studentImgUpdate(countryId,studentDTO));
     }
     //알림조회
-//    @GetMapping("/notice/{studentId}")
-//    public ResponseEntity<ApiResponseDTO> noticeCheck(@PathVariable Long studentId){
-//
-//    }
-    //알림추가
-    @PostMapping("/notice/add")
-    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@RequestBody NoticeDTO noticeDTO){
-        return ResponseEntity.ok(studentService.noticeAdd(noticeDTO));
+    @GetMapping("/notice/{countryId}/{studentId}")
+    public ResponseEntity<ApiResponseDTO<List<NoticeData>>> noticeCheck(@PathVariable Long countryId,@PathVariable Long studentId){
+        List<NoticeData> noticeDataList = new ArrayList<>();
+        ApiResponseDTO<List<NoticeDTO>> apiData = studentService.noticeList(countryId,studentId);
+        List<NoticeDTO> notices = apiData.getResult();
+        for(NoticeDTO notice : notices) {
+            if(notice.getIsChecked() == false){
+                NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
+                noticeDataList.add(noticeData);
+            }
+            else { // 이미 조회한걸 다시 보는 경우
+                NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
+                noticeDataList.add(noticeData);
+            }
+        }
+        return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),noticeDataList));
     }
+    //알림추가
+    @PostMapping("/notice/add/{countryId}")
+    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@PathVariable Long countryId,@RequestBody NoticeDTO noticeDTO){
+        return ResponseEntity.ok(studentService.noticeAdd(countryId,noticeDTO));
+    }
+
     static class StudentData {
         @JsonProperty
         private final Long id;
@@ -106,6 +122,23 @@ public class StudentController {
             this.name = name;
             this.rollNumber = rollNumber;
             this.rating = rating;
+        }
+    }
+
+    static class NoticeData {
+        @JsonProperty
+        private final Long id;
+        @JsonProperty
+        private final String content;
+        @JsonProperty
+        private final Integer isChecked;
+        @JsonProperty
+        private final Date createAt;
+        public NoticeData(Long id, String content, Integer isChecked, Date createAt) {
+            this.id = id;
+            this.content = content;
+            this.isChecked = isChecked;
+            this.createAt = createAt;
         }
     }
 

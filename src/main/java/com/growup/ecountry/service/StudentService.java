@@ -22,9 +22,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -192,14 +197,68 @@ public class StudentService {
         }
     }
     //알림조회
-    //알림추가
-    public ApiResponseDTO<NullType> noticeAdd(NoticeDTO noticeDTO){
-        Optional<Students> studentExist = studentRepository.findById(noticeDTO.getStudentId());
-        Notice notice = Notice.builder()
-                .content(noticeDTO.getContent())
-                .studentId(noticeDTO.getStudentId())
-                .build();
-        noticeRepository.save(notice);
-        return new ApiResponseDTO<>(true,"알림이 발송되었습니다",null);
+    public ApiResponseDTO<List<NoticeDTO>> noticeList(Long countryId, Long studentId){
+        List<NoticeDTO> noticeDTOList = new ArrayList<>();
+        Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentId,countryId);
+        if(studentExist.isPresent()){
+            Students student = studentExist.get();
+            List<Notice> noticeList = noticeRepository.findAllByStudentId(student.getId());
+            for(Notice notice : noticeList){
+                NoticeDTO noticeDTO = NoticeDTO.builder()
+                        .id(notice.getId())
+                        .content(notice.getContent())
+                        .isChecked(notice.getIsChecked())
+                        .createdAt(notice.getCreatedAt())
+                        .studentId(List.of(notice.getStudentId()))
+                        .build();
+                noticeDTOList.add(noticeDTO);
+                //알림 확인으로 update
+                Notice updateNotice = Notice.builder()
+                        .id(notice.getId())
+                        .content(notice.getContent())
+                        .studentId(notice.getId())
+                        .isChecked(true)
+                        .createdAt(notice.getCreatedAt())
+                        .build();
+                noticeRepository.save(updateNotice);
+            }
+            return new ApiResponseDTO<>(true,"알림조회 성공",noticeDTOList);
+        }
+        else {
+            return new ApiResponseDTO<>(false,"알림 조회 실패: 국민이 존재하지 않습니다",null);
+        }
     }
+    //알림추가(국가ID?)
+    public ApiResponseDTO<NullType> noticeAdd(Long countryId,NoticeDTO noticeDTO){
+        Optional<Countries> countryExist = countryRepository.findById(countryId);
+        if(countryExist.isPresent()){
+            for(Long studentId : noticeDTO.getStudentId()){
+                Optional<Students> studentExist = studentRepository.findById(studentId);
+                if (studentExist.isPresent()) {
+                    Students student = studentExist.get();
+                    Notice notice = Notice.builder()
+                            .content(noticeDTO.getContent())
+                            .studentId(student.getId())
+                            .build();
+                    noticeRepository.save(notice);
+                }
+            }
+            return new ApiResponseDTO<>(true,"알림이 발송되었습니다",null);
+        }
+        else {
+            return new ApiResponseDTO<>(false,"알림 발송에 실패하였습니다",null);
+        }
+    }
+//    // Date를 문자열로 형식화하는 함수
+//    private Date formatDate(Date date) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String formattedDate = sdf.format(date);
+//        try {
+//            return sdf.parse(formattedDate);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 }
+

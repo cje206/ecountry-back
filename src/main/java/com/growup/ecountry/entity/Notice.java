@@ -1,13 +1,20 @@
 package com.growup.ecountry.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
 @Builder
 public class Notice {
     @Id
@@ -17,11 +24,13 @@ public class Notice {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false, columnDefinition = "tinyint default 0")
+//    @ColumnDefault("0")
+    @Column(columnDefinition = "TINYINT(1) default 0")
     private Boolean isChecked;
 
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Long createdAt;
+    private Date createdAt;
 
     @ManyToOne
     @JoinColumn(name = "student_id", insertable=false, updatable=false)
