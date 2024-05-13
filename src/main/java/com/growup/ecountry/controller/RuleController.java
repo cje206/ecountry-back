@@ -24,7 +24,7 @@ public class RuleController {
         Boolean result = ruleService.setRules(ruleDTOList);
         String msg = result ? "규칙생성에 성공하였습니다." : "규칙생성에 실패하였습니다.";
 
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(result, msg,null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(result, msg));
     }
     //규칙리스트 조회
     @GetMapping("/{countryId}")
@@ -52,7 +52,7 @@ public class RuleController {
         Boolean result = ruleService.deleteRules(id);
         String msg = result ? "규칙삭제에 성공하였습니다." : "규칙삭제에 실패하였습니다.";
 
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(result, msg,null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(result, msg));
     }
     //규칙 업데이트
     @PatchMapping
@@ -60,7 +60,7 @@ public class RuleController {
         Boolean result = ruleService.updateRule(ruleDTO);
         String msg = result ? "규칙수정에 성공하였습니다." : "규칙수정에 실패하였습니다.";
 
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(result, msg,null));
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(result, msg));
     }
 
     //규칙리스트 정보 응답
