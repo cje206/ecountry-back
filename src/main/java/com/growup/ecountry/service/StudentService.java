@@ -5,16 +5,15 @@ import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
-import com.growup.ecountry.entity.Accounts;
-import com.growup.ecountry.entity.Countries;
-import com.growup.ecountry.entity.Students;
-import com.growup.ecountry.entity.Users;
+import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.AccountRepository;
 import com.growup.ecountry.repository.CountryRepository;
+import com.growup.ecountry.repository.NoticeRepository;
 import com.growup.ecountry.repository.StudentRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +32,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final CountryRepository countryRepository;
     private final AccountRepository accountRepository;
+    private final NoticeRepository noticeRepository;
     //국민등록(수기)
     public ApiResponseDTO<NullType> studentAdd(Long countryId, List<StudentDTO> students){
         Optional<Countries> countryExist = countryRepository.findById(countryId);
@@ -136,14 +136,20 @@ public class StudentService {
             return new ApiResponseDTO<>(true,"국민수정 성공",null);
     }
     //학생로그인
-    public ApiResponseDTO<Long> studentLogin(StudentDTO studentDTO){
-            Optional<Students> studentExist = studentRepository.findByNameANDPw(studentDTO.getName(),studentDTO.getPw());
-            if(studentExist.isPresent()){
-                Students students = studentExist.get();
-                return new ApiResponseDTO<>(true,"학생 로그인 성공",students.getId());
+    public ApiResponseDTO<Long> studentLogin(Long countryId,StudentDTO studentDTO){
+            Optional<Countries> countryExist = countryRepository.findById(countryId);
+            if(countryExist.isPresent()){
+                Optional<Students> studentExist = studentRepository.findByNameANDPw(studentDTO.getName(),studentDTO.getPw());
+                if(studentExist.isPresent()){
+                    Students students = studentExist.get();
+                    return new ApiResponseDTO<>(true,"학생 로그인 성공",students.getId());
+                }
+                else {
+                    return new ApiResponseDTO<>(false,"사용자 정보가 일치하지 않습니다",null);
+                }
             }
             else {
-                return new ApiResponseDTO<>(false,"사용자 정보가 일치하지 않습니다",null);
+                return new ApiResponseDTO<>(false,"국가가 존재하지 않습니다",null);
             }
     }
     //학생비밀번호 변경
@@ -187,7 +193,13 @@ public class StudentService {
     }
     //알림조회
     //알림추가
-//    public ApiResponseDTO<NullType> noticeAdd(NoticeDTO noticeDTO){
-//
-//    }
+    public ApiResponseDTO<NullType> noticeAdd(NoticeDTO noticeDTO){
+        Optional<Students> studentExist = studentRepository.findById(noticeDTO.getStudentId());
+        Notice notice = Notice.builder()
+                .content(noticeDTO.getContent())
+                .studentId(noticeDTO.getStudentId())
+                .build();
+        noticeRepository.save(notice);
+        return new ApiResponseDTO<>(true,"알림이 발송되었습니다",null);
+    }
 }
