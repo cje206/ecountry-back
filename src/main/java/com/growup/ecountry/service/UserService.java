@@ -43,12 +43,12 @@ public class UserService {
         }
     }
 
-    public ApiResponseDTO<NullType> login(UserDTO userDTO) {
+    public ApiResponseDTO<Long> login(UserDTO userDTO) {
         Optional<Users> userIdExist = userRepository.findByUserId(userDTO.getUserId());
         if(userIdExist.isPresent()){
             Optional<Users> userPwExist = userRepository.findByPw(userDTO.getPw());
             if(userPwExist.isPresent()){
-                return new ApiResponseDTO<>(true,"로그인 성공",null);
+                return new ApiResponseDTO<>(true,"로그인 성공",userIdExist.get().getId());
             }
             else {
                 return new ApiResponseDTO<>(false,"비밀번호를 잘못 입력하셨습니다",null);
@@ -58,8 +58,8 @@ public class UserService {
             return new ApiResponseDTO<>(false,"아이디를 잘못 입력하셨습니다",null);
         }
     }
-    public Boolean pwUpdate(String userId, String pw){
-        Optional<Users> userExist = userRepository.findByUserId(userId);
+    public Boolean pwUpdate(Long id, String pw){
+        Optional<Users> userExist = userRepository.findById(id);
         if(userExist.isPresent()){
             Users user = userExist.get();
             user = Users.builder()

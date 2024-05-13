@@ -27,8 +27,8 @@ public class CountryController {
     //국가생성
      @PostMapping
      public ResponseEntity<ApiResponseDTO<NullType>> create(@RequestHeader(value = "Authorization") String token, @RequestBody CountryDTO countryDTO){
-         String authToken = jwt.validateToken(token);
-         if(authToken != "false") {
+         Long authToken = jwt.validateToken(token);
+         if(authToken != 0) {
             return ResponseEntity.ok(countryService.create(countryDTO,authToken));
          }
          else {
