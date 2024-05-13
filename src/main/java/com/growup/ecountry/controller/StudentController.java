@@ -1,8 +1,11 @@
 package com.growup.ecountry.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
+import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
+import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.service.StudentService;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentController {
     private final StudentService studentService;
+    private final TokenProvider jwt;
 
     //국민등록(수기)
     @PostMapping("/{countryId}")
@@ -55,8 +59,40 @@ public class StudentController {
     public ResponseEntity<ApiResponseDTO<NullType>> studentUpdate(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
         return ResponseEntity.ok(studentService.studentUpdate(countryId,studentDTO));
     }
-
-
+    //학생로그인
+    @PostMapping("/user")
+    public ResponseEntity<ApiResponseDTO<String>> studentLogin(@RequestBody StudentDTO studentDTO){
+        ApiResponseDTO<Long> result = studentService.studentLogin(studentDTO);
+        Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(),true)) : new Token(null);
+        return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), token.getToken()));
+    }
+    //학생비밀번호 변경
+    @PatchMapping("/user")
+    public ResponseEntity<ApiResponseDTO<NullType>> studentPwUpdate(@RequestHeader("Authorization") String token,@RequestBody StudentDTO studentDTO){
+        TokenDTO authToken = jwt.validateToken(token);
+        if(authToken != null) {
+            return ResponseEntity.ok(studentService.studentPwUpdate(authToken.getId(), studentDTO));
+        }
+        else {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"사용자 인증에 실패하였습니다",null));
+        }
+    }
+    //학생이미지 수정
+    @PatchMapping("/user/img/{countryId}")
+    public ResponseEntity<ApiResponseDTO<NullType>> studentImgUpdate(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
+        return ResponseEntity.ok(studentService.studentImgUpdate(countryId,studentDTO));
+    }
+    //알림조회
+//    @GetMapping("/notice/{studentId}")
+//    public ResponseEntity<ApiResponseDTO> noticeCheck(@PathVariable Long studentId){
+//
+//    }
+    //알림추가
+//    @PostMapping("/notice/add")
+//    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@RequestBody NoticeDTO noticeDTO){
+//        return ResponseEntity.ok(studentService.noticeAdd(noticeDTO));
+//        return null;
+//    }
     static class StudentData {
         @JsonProperty
         private final Long id;
@@ -71,6 +107,18 @@ public class StudentController {
             this.name = name;
             this.rollNumber = rollNumber;
             this.rating = rating;
+        }
+    }
+
+    //토큰 발급
+    static class Token{
+        @JsonProperty
+        private final String token;
+        public Token(String token){
+            this.token = token;
+        }
+        public String getToken(){
+            return this.token;
         }
     }
 }
