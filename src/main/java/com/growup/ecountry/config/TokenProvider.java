@@ -28,6 +28,7 @@ public class TokenProvider {
     @Value("${jwt.expiration}")
     private int expiration;
 
+
     // 토큰에서 userId을 추출
     public String extractId(String token) {
         return extractClaim(token, Claims::getSubject);
