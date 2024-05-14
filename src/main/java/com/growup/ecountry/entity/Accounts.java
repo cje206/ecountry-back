@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +22,15 @@ public class Accounts {
     private Integer balance;
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Long createdAt;
+    private Timestamp createdAt;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "accounts1")
+    private List<Banks> banks1 = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "accounts2")
+    private List<Banks> banks2 = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "student_id", insertable=false, updatable=false)
