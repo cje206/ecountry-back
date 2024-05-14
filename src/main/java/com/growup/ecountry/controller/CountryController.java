@@ -22,35 +22,78 @@ public class CountryController {
 
     //국가정보 조회
     @GetMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<CountryDTO>> findAllCountries(@PathVariable Long countryId){
-        return ResponseEntity.ok(countryService.findCountries(countryId));
+    public ResponseEntity<ApiResponseDTO<CountryData>> findAllCountries(@PathVariable Long countryId){
+        try {
+            ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(countryId);
+            CountryDTO countryDTO = apiData.getResult();
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(),apiData.getMessage(), new CountryData(countryDTO.getName(), countryDTO.getGrade(), countryDTO.getClassroom(), countryDTO.getSalaryDate(), countryDTO.getSchool(), countryDTO.getTreasury())));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가정보 조회 실패",null));
+        }
     }
 
     //국가생성
      @PostMapping
-     public ResponseEntity<ApiResponseDTO<Long>> create(@RequestHeader(value = "Authorization") String token, @RequestBody CountryDTO countryDTO){
-         TokenDTO authToken = jwt.validateToken(token);
-         if(authToken.getId() != 0) {
-             ApiResponseDTO<Long> apiData = countryService.create(countryDTO, authToken.getId());
-             CountryData countryData = new CountryData(apiData.getResult());
-            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), countryData.countryId));
-         }
-         else {
+     public ResponseEntity<ApiResponseDTO<CountryData2>> create(@RequestHeader(value = "Authorization") String token, @RequestBody CountryDTO countryDTO){
+        try {
+            TokenDTO authToken = jwt.validateToken(token);
+            if(authToken.getId() != 0) {
+                ApiResponseDTO<Long> apiData = countryService.create(countryDTO, authToken.getId());
+                return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),  new CountryData2(apiData.getResult())));
+            }
+            else {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 생성 실패",null));
+            }
+        } catch (Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 생성 실패",null));
-         }
+        }
      }
 
     //국가삭제
      @DeleteMapping("/{id}")
      public ResponseEntity<ApiResponseDTO<NullType>> delete(@PathVariable Long id){
-        return ResponseEntity.ok(countryService.delete(id));
+        try{
+            return ResponseEntity.ok(countryService.delete(id));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 삭제 실패",null));
+        }
+    }
+
+    //국고 수정
+    @PatchMapping("/treasury/{countryId}")
+    public ResponseEntity<ApiResponseDTO<NullType>> updateTreasury(@PathVariable Long countryId,@RequestBody CountryDTO countryDTO){
+        boolean success = countryService.updateTreasury(countryId, countryDTO.getTreasury());
+        String msg = success ? "국고 수정에 성공하였습니다." : "국고 수정에 실패하였습니다.";
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
 
     static class CountryData {
         @JsonProperty
-        private final Long countryId;
-        public CountryData(Long countryId) {
-            this.countryId = countryId;
+        private final String name;
+        @JsonProperty
+        private final Integer grade;
+        @JsonProperty
+        private final Integer classroom;
+        @JsonProperty
+        private final Integer salaryDate;
+        @JsonProperty
+        private final String school;
+        @JsonProperty
+        private final Integer treasury;
+        public CountryData(String name, Integer grade, Integer classroom, Integer salaryDate, String school, Integer treasury) {
+            this.name = name;
+            this.grade = grade;
+            this.classroom = classroom;
+            this.salaryDate = salaryDate;
+            this.school = school;
+            this.treasury = treasury;
+        }
+    }
+    static class CountryData2 {
+        @JsonProperty
+        private final Long id;
+        public CountryData2(Long id) {
+            this.id = id;
         }
     }
 }
