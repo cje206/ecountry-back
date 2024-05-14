@@ -6,6 +6,8 @@ import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.dto.TokenDTO;
+import com.growup.ecountry.entity.Jobs;
+import com.growup.ecountry.repository.JobRepository;
 import com.growup.ecountry.service.StudentService;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentController {
     private final StudentService studentService;
+    private final JobRepository jobRepository;
     private final TokenProvider jwt;
 
     //국민등록(수기)
@@ -46,7 +49,8 @@ public class StudentController {
         ApiResponseDTO<List<StudentDTO>> apiData = studentService.studentList(countryId);
         List<StudentDTO> students = apiData.getResult();
         for(StudentDTO student : students) {
-            StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating());
+            Jobs studentJob = jobRepository.findById(student.getJobId()).get();
+            StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),studentJob.getName(),student.getJobId());
             studentDataList.add(studentData);
         }
         return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),studentDataList));
@@ -58,8 +62,8 @@ public class StudentController {
     }
     //국민수정
     @PatchMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<NullType>> studentUpdate(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
-        return ResponseEntity.ok(studentService.studentUpdate(countryId,studentDTO));
+    public ResponseEntity<ApiResponseDTO<NullType>> studentUpdate(@PathVariable Long countryId,@RequestBody List<StudentDTO> studentDTOs){
+        return ResponseEntity.ok(studentService.studentUpdate(countryId,studentDTOs));
     }
     //학생로그인
     @PostMapping("/user/{countryId}")
@@ -121,11 +125,17 @@ public class StudentController {
         private final Integer rollNumber;
         @JsonProperty
         private final Integer rating;
-        public StudentData(Long id, String name, Integer rollNumber, Integer rating) {
+        @JsonProperty
+        private final String job;
+        @JsonProperty
+        private final Long jobId;
+        public StudentData(Long id, String name, Integer rollNumber, Integer rating, String job, Long jobId) {
             this.id = id;
             this.name = name;
             this.rollNumber = rollNumber;
             this.rating = rating;
+            this.job = job;
+            this.jobId = jobId;
         }
     }
 

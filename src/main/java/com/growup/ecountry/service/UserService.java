@@ -9,6 +9,7 @@ import com.growup.ecountry.entity.Countries;
 import com.growup.ecountry.entity.Students;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.repository.CountryRepository;
+import com.growup.ecountry.repository.JobRepository;
 import com.growup.ecountry.repository.StudentRepository;
 import com.growup.ecountry.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final StudentRepository studentRepository;
+    private final JobRepository jobRepository;
     private final TokenProvider jwt;
 //    private final PasswordEncoder passwordEncoder;
 
@@ -62,6 +64,7 @@ public class UserService {
             return new ApiResponseDTO<>(false,"아이디를 잘못 입력하셨습니다",null);
         }
     }
+    //선생님/학생 정보 조회
     public ApiResponseDTO<?> userInfo(Long id,Boolean isStudent) {
         if(isStudent == false){
             Optional<Users> userExist = userRepository.findById(id);
@@ -71,6 +74,7 @@ public class UserService {
                         .id(user.getId())
                         .name(user.getName())
                         .userId(user.getUserId())
+                        .img(user.getImg())
                         .build();
                 return new ApiResponseDTO<>(true, "회원 정보 조회", userDTO);
             }
@@ -86,7 +90,9 @@ public class UserService {
                         .id(student.getId())
                         .name(student.getName())
                         .rollNumber(student.getRollNumber())
-                        .rating(student.getRating()).build();
+                        .rating(student.getRating())
+                        .img(student.getImg())
+                        .jobId(student.getJobId()).build();
                 return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
             }
             else {

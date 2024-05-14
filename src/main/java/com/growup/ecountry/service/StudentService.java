@@ -7,11 +7,7 @@ import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.entity.*;
-import com.growup.ecountry.repository.AccountListRepository;
-import com.growup.ecountry.repository.AccountRepository;
-import com.growup.ecountry.repository.CountryRepository;
-import com.growup.ecountry.repository.NoticeRepository;
-import com.growup.ecountry.repository.StudentRepository;
+import com.growup.ecountry.repository.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +37,7 @@ public class StudentService {
     private final AccountRepository accountRepository;
     private final AccountListRepository accountListRepository;
     private final NoticeRepository noticeRepository;
+    private final JobRepository jobRepository;
     //국민등록(수기)
     public ApiResponseDTO<NullType> studentAdd(Long countryId, List<StudentDTO> students){
         Optional<Countries> countryExist = countryRepository.findById(countryId);
@@ -52,13 +49,19 @@ public class StudentService {
                         .rollNumber(student.getRollNumber())
                         .pw(student.getPw())
                         .img(student.getImg())
-                        .countryId(countries.getId()).build();
+                        .countryId(countries.getId())
+                        .jobId(1L).build();
                 studentRepository.save(studentEntity);
                 List<AccountLists> accountInfo = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true);
-                Accounts accounts = Accounts.builder()
-                        .balance(0).accountListId(accountInfo.get(0).getId())
-                        .studentId(studentEntity.getId()).build();
-                        accountRepository.save(accounts);
+                if(!accountInfo.isEmpty()){
+                    Accounts accounts = Accounts.builder()
+                            .balance(0).accountListId(accountInfo.get(0).getId())
+                            .studentId(studentEntity.getId()).build();
+                    accountRepository.save(accounts);
+                }
+                else {
+                    return new ApiResponseDTO<>(false,"사용 가능한 계좌 목록이 없습니다",null);
+                }
             }
             return new ApiResponseDTO<>(true,"국민등록 성공",null);
         }
@@ -88,8 +91,19 @@ public class StudentService {
                                     .name(columns[0])
                                     .rollNumber(Integer.parseInt(columns[1]))
                                     .pw(columns[2])
-                                    .countryId(countries.getId()).build();
+                                    .countryId(countries.getId())
+                                    .jobId(1L).build();
                     studentRepository.save(student);
+                    List<AccountLists> accountInfo = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true);
+                    if(!accountInfo.isEmpty()){
+                        Accounts accounts = Accounts.builder()
+                                .balance(0).accountListId(accountInfo.get(0).getId())
+                                .studentId(student.getId()).build();
+                        accountRepository.save(accounts);
+                    }
+                    else {
+                        return new ApiResponseDTO<>(false,"사용 가능한 계좌 목록이 없습니다",null);
+                    }
                     Accounts accounts = Accounts.builder()
                             .balance(0)
                             .studentId(student.getId()).build();
@@ -112,6 +126,7 @@ public class StudentService {
                         .name(student.getName())
                         .rollNumber(student.getRollNumber())
                         .rating(student.getRating())
+                        .jobId(student.getJobId())
                         .build();
                 studentDTOList.add(studentDTO);
             }
@@ -130,19 +145,22 @@ public class StudentService {
         }
     }
     //국민수정
-    public ApiResponseDTO<NullType> studentUpdate(Long countryId,StudentDTO studentDTO){
-        Students student = studentRepository.findByIdANDCountryId(studentDTO.getId(),countryId).orElseThrow(()->{
-            throw new IllegalArgumentException("학생 정보 혹은 국가 아이디가 존재하지 않습니다");
-        });
-        student = Students.builder()
+    public ApiResponseDTO<NullType> studentUpdate(Long countryId,List<StudentDTO> studentDTOs){
+        for(StudentDTO studentDTO : studentDTOs){
+            Students student = studentRepository.findByIdANDCountryId(studentDTO.getId(),countryId).orElseThrow(()->{
+                throw new IllegalArgumentException("학생 정보 혹은 국가 아이디가 존재하지 않습니다");
+            });
+            student = Students.builder()
                     .id(studentDTO.getId())
                     .name(studentDTO.getName())
                     .rollNumber(studentDTO.getRollNumber())
                     .pw(studentDTO.getPw())
                     .rating(studentDTO.getRating())
+                    .jobId(studentDTO.getJobId())
                     .countryId(student.getCountryId()).build();
             studentRepository.save(student);
-            return new ApiResponseDTO<>(true,"국민수정 성공",null);
+        }
+        return new ApiResponseDTO<>(true,"국민수정 성공",null);
     }
     //학생로그인
     public ApiResponseDTO<Long> studentLogin(Long countryId,StudentDTO studentDTO){

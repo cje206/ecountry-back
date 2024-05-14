@@ -40,9 +40,5 @@ public class BankService {
                 .depositName(getStudentName(list.getDepositId())).withdrawName(getStudentName(list.getWithdrawId())).build()).collect(Collectors.toList());
     }
 
-    public List<BankDTO> getBankList
-
-
-
-
+//    public List<BankDTO> getBankList
 }
