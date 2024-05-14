@@ -282,5 +282,18 @@ public class StudentService {
 //            return null;
 //        }
 //    }
+
+    //학생 신용등급 수정
+    public boolean updateRating(StudentDTO studentDTO){
+        Students student = studentRepository.findById(studentDTO.getId()).orElseThrow();
+        try {
+            student.setRating(studentDTO.getRating());
+            studentRepository.save(student);
+        }catch (Exception e){
+            System.out.print("학생 신용등급 수정 오류 : " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
 }
 
