@@ -1,14 +1,13 @@
 package com.growup.ecountry.service;
 
 import com.growup.ecountry.dto.AccountDTO;
+import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.BankDTO;
 import com.growup.ecountry.entity.Accounts;
 import com.growup.ecountry.entity.Banks;
+import com.growup.ecountry.entity.Jobs;
 import com.growup.ecountry.entity.Students;
-import com.growup.ecountry.repository.AccountListRepository;
-import com.growup.ecountry.repository.AccountRepository;
-import com.growup.ecountry.repository.BankRepository;
-import com.growup.ecountry.repository.StudentRepository;
+import com.growup.ecountry.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +21,7 @@ public class BankService {
     private final BankRepository bankRepository;
     private final StudentRepository studentRepository;
     private final AccountListRepository accountListRepository;
+    private final JobRepository jobRepository;
 
     public String getStudentName(Long accountId) {
         Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
@@ -56,5 +56,20 @@ public class BankService {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
         return accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
                 .id(account.getId()).name(getStudentName(account.getId())).build()).collect(Collectors.toList());
+    }
+    //월급명세서
+    //월급금액확인
+    public ApiResponseDTO<Banks> checkSalary(Long countryId, Long studentId) {
+        Students student = studentRepository.findByIdANDCountryId(studentId, countryId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+        Jobs jobs = jobRepository.findById(student.getJobId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다"));
+        List<Accounts> accounts = accountRepository.findByStudentId(student.getId());
+        Banks banks = Banks.builder()
+                .transaction(jobs.getSalary())
+                .memo("월급")
+                .depositId(accounts.get(0).getId())
+                .withdrawId(0L)
+                .build();
+        bankRepository.save(banks);
+        return new ApiResponseDTO<>(true, "월급금액 확인", banks);
     }
 }
