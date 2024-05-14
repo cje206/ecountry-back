@@ -1,7 +1,10 @@
 package com.growup.ecountry.controller;
 
+import com.growup.ecountry.config.TokenProvider;
+import com.growup.ecountry.dto.AccountDTO;
 import com.growup.ecountry.dto.AccountListDTO;
 import com.growup.ecountry.dto.ApiResponseDTO;
+import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountController {
     private final AccountService accountService;
+    private final TokenProvider jwt;
 
     @PostMapping
     public ResponseEntity<ApiResponseDTO<NullType>> createList(@RequestBody AccountListDTO accountListDTO) {
@@ -57,5 +61,23 @@ public class AccountController {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "적금 통장 비활성화 실패"));
         }
     }
+    //적금가입
+    @PostMapping("/saving")
+    public ResponseEntity<ApiResponseDTO<NullType>> createSaving(@RequestHeader(value = "Authorization") String token,@RequestBody AccountDTO accountDTO){
+        TokenDTO authToken = jwt.validateToken(token);
+        accountDTO.setStudentId(authToken.getId());
+        boolean success = accountService.createSaving(accountDTO);
+        String msg = success ? "적금통장 개설에 성공하였습니다." : "적금통장 개설에 실패하였습니다. ";
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
+    }
+
+    //학생별 가입된 적금리스트 조회
+    @GetMapping("/saving")
+    public ResponseEntity<ApiResponseDTO<List<AccountService.SavingList>>> findAllSaving(@RequestHeader(value = "Authorization") String token){
+        TokenDTO authToken = jwt.validateToken(token);
+        List<AccountService.SavingList> savingLists  = accountService.findSavingList(authToken.getId());
+        return ResponseEntity.ok(new ApiResponseDTO<List<AccountService.SavingList>>(true, "가입된 적금리스트 정보 조회에 성공하였습니다.", savingLists));
+    }
+
 
 }
