@@ -15,4 +15,5 @@ public class AccountDTO {
     private Timestamp createdAt;
     private Long studentId;
     private Long accountListId;
+    private String name;
 }
