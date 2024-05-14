@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -16,7 +19,7 @@ public class AccountLists {
     private Long id;
 
     @Column(columnDefinition = "TINYINT(1) default 1", nullable = false)
-    private boolean division;
+    private Boolean division;
 
     @Column(nullable = false)
     private String name;
@@ -28,7 +31,7 @@ public class AccountLists {
     private Integer dueDate;
 
     @Column(columnDefinition = "TINYINT(1) default 1", nullable = false)
-    private boolean available;
+    private Boolean available;
 
     @ManyToOne
     @JoinColumn(name = "country_id", insertable=false, updatable=false)

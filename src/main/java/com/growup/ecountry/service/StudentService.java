@@ -1,11 +1,13 @@
 package com.growup.ecountry.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.growup.ecountry.dto.AccountListDTO;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.entity.*;
+import com.growup.ecountry.repository.AccountListRepository;
 import com.growup.ecountry.repository.AccountRepository;
 import com.growup.ecountry.repository.CountryRepository;
 import com.growup.ecountry.repository.NoticeRepository;
@@ -32,6 +34,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final CountryRepository countryRepository;
     private final AccountRepository accountRepository;
+    private final AccountListRepository accountListRepository;
     private final NoticeRepository noticeRepository;
     //국민등록(수기)
     public ApiResponseDTO<NullType> studentAdd(Long countryId, List<StudentDTO> students){
@@ -46,8 +49,9 @@ public class StudentService {
                         .img(student.getImg())
                         .countryId(countries.getId()).build();
                 studentRepository.save(studentEntity);
+                List<AccountLists> accountInfo = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true);
                 Accounts accounts = Accounts.builder()
-                        .balance(0)
+                        .balance(0).accountListId(accountInfo.get(0).getId())
                         .studentId(studentEntity.getId()).build();
                         accountRepository.save(accounts);
             }

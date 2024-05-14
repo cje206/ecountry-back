@@ -57,7 +57,8 @@ public class CountryService {
                     .classroom(countryDTO.getClassroom())
                     .unit(countryDTO.getUnit())
                     .users(users).build();
-            countryRepository.save(countries);
+            Countries newCountry = countryRepository.save(countries);
+            accountListRepository.save(AccountLists.builder().division(false).name("입출금 통장").interest(0.0).available(true).build());
             return  new ApiResponseDTO<>(true,"국가 생성 완료",null);
         }
         else {
