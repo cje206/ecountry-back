@@ -47,7 +47,8 @@ public class AccountService {
     }
 
     public List<AccountDTO> getAccount(Long studentId) {
-        return accountRepository.findById(studentId).stream().map(account -> AccountDTO.builder().id(account.getId())
+        System.out.println(accountRepository.findByStudentId(studentId));
+        return accountRepository.findByStudentId(studentId).stream().map(account -> AccountDTO.builder().id(account.getId())
                 .balance(account.getBalance()).createdAt(account.getCreatedAt())
                 .studentId(account.getStudentId()).accountListId(account.getAccountListId())
                 .build()).collect(Collectors.toList());
