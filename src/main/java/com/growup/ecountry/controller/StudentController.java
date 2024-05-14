@@ -67,10 +67,10 @@ public class StudentController {
     }
     //학생로그인
     @PostMapping("/user/{countryId}")
-    public ResponseEntity<ApiResponseDTO<String>> studentLogin(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
+    public ResponseEntity<ApiResponseDTO<StudentData2>> studentLogin(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
         ApiResponseDTO<Long> result = studentService.studentLogin(countryId,studentDTO);
         Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(),true)) : new Token(null);
-        return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), token.getToken()));
+        return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), new StudentData2(token.getToken())));
     }
     //학생비밀번호 변경
     @PatchMapping("/user")
@@ -146,7 +146,13 @@ public class StudentController {
             this.jobId = jobId;
         }
     }
-
+    static class StudentData2 {
+        @JsonProperty
+        private final String token;
+        public StudentData2(String token) {
+            this.token = token;
+        }
+    }
     static class NoticeData {
         @JsonProperty
         private final Long id;
