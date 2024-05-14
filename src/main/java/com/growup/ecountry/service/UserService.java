@@ -3,10 +3,13 @@ package com.growup.ecountry.service;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
+import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.dto.UserDTO;
 import com.growup.ecountry.entity.Countries;
+import com.growup.ecountry.entity.Students;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.repository.CountryRepository;
+import com.growup.ecountry.repository.StudentRepository;
 import com.growup.ecountry.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +27,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
+    private final StudentRepository studentRepository;
     private final TokenProvider jwt;
 //    private final PasswordEncoder passwordEncoder;
 
@@ -57,6 +61,39 @@ public class UserService {
         else {
             return new ApiResponseDTO<>(false,"아이디를 잘못 입력하셨습니다",null);
         }
+    }
+    public ApiResponseDTO<?> userInfo(Long id,Boolean isStudent) {
+        if(isStudent == false){
+            Optional<Users> userExist = userRepository.findById(id);
+            if (userExist.isPresent()) {
+                Users user = userExist.get();
+                UserDTO userDTO = UserDTO.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .userId(user.getUserId())
+                        .build();
+                return new ApiResponseDTO<>(true, "회원 정보 조회", userDTO);
+            }
+            else {
+                return new ApiResponseDTO<>(false, "존재하지 않는 회원입니다", null);
+            }
+        }
+        else {
+            Optional<Students> studentEXIST = studentRepository.findById(id);
+            if(studentEXIST.isPresent()){
+                Students student = studentEXIST.get();
+                StudentDTO studentDTO = StudentDTO.builder()
+                        .id(student.getId())
+                        .name(student.getName())
+                        .rollNumber(student.getRollNumber())
+                        .rating(student.getRating()).build();
+                return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
+            }
+            else {
+                return new ApiResponseDTO<>(false, "존재하지 않는 학생입니다", null);
+            }
+        }
+
     }
     public Boolean pwUpdate(Long id, String pw){
         Optional<Users> userExist = userRepository.findById(id);

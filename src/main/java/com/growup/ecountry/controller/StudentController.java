@@ -85,22 +85,26 @@ public class StudentController {
         return ResponseEntity.ok(studentService.studentImgUpdate(countryId,studentDTO));
     }
     //알림조회
-    @GetMapping("/notice/{countryId}/{studentId}")
-    public ResponseEntity<ApiResponseDTO<List<NoticeData>>> noticeCheck(@PathVariable Long countryId,@PathVariable Long studentId){
+    @GetMapping("/notice")
+    public ResponseEntity<ApiResponseDTO<List<NoticeData>>> noticeCheck(@RequestHeader("Authorization") String token){
         List<NoticeData> noticeDataList = new ArrayList<>();
-        ApiResponseDTO<List<NoticeDTO>> apiData = studentService.noticeList(countryId,studentId);
-        List<NoticeDTO> notices = apiData.getResult();
-        for(NoticeDTO notice : notices) {
-            if(notice.getIsChecked() == false){
-                NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
-                noticeDataList.add(noticeData);
+        TokenDTO authToken = jwt.validateToken(token);
+        if(authToken != null){
+            ApiResponseDTO<List<NoticeDTO>> apiData = studentService.noticeList(authToken.getId());
+            List<NoticeDTO> notices = apiData.getResult();
+            for(NoticeDTO notice : notices) {
+                if(notice.getIsChecked() == false){
+                    NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
+                    noticeDataList.add(noticeData);
+                }
+                else { // 이미 조회한걸 다시 보는 경우
+                    NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
+                    noticeDataList.add(noticeData);
+                }
             }
-            else { // 이미 조회한걸 다시 보는 경우
-                NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
-                noticeDataList.add(noticeData);
-            }
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),noticeDataList));
         }
-        return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),noticeDataList));
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"사용자 인증에 실패하였습니다",noticeDataList));
     }
     //알림추가
     @PostMapping("/notice/add/{countryId}")

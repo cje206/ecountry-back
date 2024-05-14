@@ -197,9 +197,9 @@ public class StudentService {
         }
     }
     //알림조회
-    public ApiResponseDTO<List<NoticeDTO>> noticeList(Long countryId, Long studentId){
+    public ApiResponseDTO<List<NoticeDTO>> noticeList(Long studentId){
         List<NoticeDTO> noticeDTOList = new ArrayList<>();
-        Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentId,countryId);
+        Optional<Students> studentExist = studentRepository.findById(studentId);
         if(studentExist.isPresent()){
             Students student = studentExist.get();
             List<Notice> noticeList = noticeRepository.findAllByStudentId(student.getId());
@@ -216,9 +216,9 @@ public class StudentService {
                 Notice updateNotice = Notice.builder()
                         .id(notice.getId())
                         .content(notice.getContent())
-                        .studentId(notice.getId())
                         .isChecked(true)
                         .createdAt(notice.getCreatedAt())
+                        .studentId(notice.getStudentId())
                         .build();
                 noticeRepository.save(updateNotice);
             }
