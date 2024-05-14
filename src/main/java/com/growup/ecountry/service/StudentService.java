@@ -4,15 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.dto.AccountListDTO;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
+import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.AccountListRepository;
 import com.growup.ecountry.repository.AccountRepository;
 import com.growup.ecountry.repository.CountryRepository;
+import com.growup.ecountry.repository.NoticeRepository;
 import com.growup.ecountry.repository.StudentRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +35,7 @@ public class StudentService {
     private final CountryRepository countryRepository;
     private final AccountRepository accountRepository;
     private final AccountListRepository accountListRepository;
+    private final NoticeRepository noticeRepository;
     //국민등록(수기)
     public ApiResponseDTO<NullType> studentAdd(Long countryId, List<StudentDTO> students){
         Optional<Countries> countryExist = countryRepository.findById(countryId);
@@ -134,5 +138,72 @@ public class StudentService {
                     .countryId(student.getCountryId()).build();
             studentRepository.save(student);
             return new ApiResponseDTO<>(true,"국민수정 성공",null);
+    }
+    //학생로그인
+    public ApiResponseDTO<Long> studentLogin(Long countryId,StudentDTO studentDTO){
+            Optional<Countries> countryExist = countryRepository.findById(countryId);
+            if(countryExist.isPresent()){
+                Optional<Students> studentExist = studentRepository.findByNameANDPw(studentDTO.getName(),studentDTO.getPw());
+                if(studentExist.isPresent()){
+                    Students students = studentExist.get();
+                    return new ApiResponseDTO<>(true,"학생 로그인 성공",students.getId());
+                }
+                else {
+                    return new ApiResponseDTO<>(false,"사용자 정보가 일치하지 않습니다",null);
+                }
+            }
+            else {
+                return new ApiResponseDTO<>(false,"국가가 존재하지 않습니다",null);
+            }
+    }
+    //학생비밀번호 변경
+    public ApiResponseDTO<NullType> studentPwUpdate(Long id,StudentDTO studentDTO){
+        Optional<Students> studentExist = studentRepository.findById(id);
+        if(studentExist.isPresent()){
+            Students student = studentExist.get();
+            student = Students.builder()
+                    .id(student.getId())
+                    .name(student.getName())
+                    .rollNumber(student.getRollNumber())
+                    .pw(studentDTO.getPw())
+                    .rating(student.getRating())
+                    .countryId(student.getCountryId()).build();
+            studentRepository.save(student);
+            return new ApiResponseDTO<>(true,"비밀번호 변경 성공",null);
         }
+        else {
+            return new ApiResponseDTO<>(false,"국민이 존재하지 않습니다",null);
+        }
+    }
+    //학생이미지 수정
+    public ApiResponseDTO<NullType> studentImgUpdate(Long countryId,StudentDTO studentDTO){
+        Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentDTO.getId(),countryId);
+        if(studentExist.isPresent()){
+            Students student = studentExist.get();
+            student = Students.builder()
+                    .id(student.getId())
+                    .name(student.getName())
+                    .rollNumber(student.getRollNumber())
+                    .pw(student.getPw())
+                    .rating(student.getRating())
+                    .countryId(student.getCountryId())
+                    .img(studentDTO.getImg()).build();
+            studentRepository.save(student);
+            return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
+        }
+        else {
+            return new ApiResponseDTO<>(false,"국민이 존재하지 않습니다",null);
+        }
+    }
+    //알림조회
+    //알림추가
+    public ApiResponseDTO<NullType> noticeAdd(NoticeDTO noticeDTO){
+        Optional<Students> studentExist = studentRepository.findById(noticeDTO.getStudentId());
+        Notice notice = Notice.builder()
+                .content(noticeDTO.getContent())
+                .studentId(noticeDTO.getStudentId())
+                .build();
+        noticeRepository.save(notice);
+        return new ApiResponseDTO<>(true,"알림이 발송되었습니다",null);
+    }
 }
