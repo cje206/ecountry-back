@@ -72,6 +72,7 @@ public class BankController {
     public ResponseEntity<ApiResponseDTO<NullType>> getPaystub(@RequestHeader(value = "Authorization") String token) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "월급명세서"));
     }
+    //월급금액확인
     @GetMapping("/salary/{countryId}/{studentId}")
     public ResponseEntity<ApiResponseDTO<NullType>> getSalary(@PathVariable Long countryId, @PathVariable Long studentId) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "월급명세서"));
