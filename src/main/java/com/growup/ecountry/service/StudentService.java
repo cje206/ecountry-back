@@ -86,10 +86,10 @@ public class StudentService {
 
                 while ((line = reader.readLine()) != null) {
                     String[] columns = line.split(",");
-                    //columns[0]: name, columns[1]: roll number,columns[2]: password
+                    //columns[0]: roll number, columns[1]: name,columns[2]: password
                     Students student = Students.builder()
-                                    .name(columns[0])
-                                    .rollNumber(Integer.parseInt(columns[1]))
+                                    .rollNumber(Integer.parseInt(columns[0]))
+                                    .name(columns[1])
                                     .pw(columns[2])
                                     .countryId(countries.getId())
                                     .jobId(1L).build();
