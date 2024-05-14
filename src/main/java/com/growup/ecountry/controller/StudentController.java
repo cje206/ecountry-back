@@ -116,6 +116,14 @@ public class StudentController {
         return ResponseEntity.ok(studentService.noticeAdd(countryId,noticeDTO));
     }
 
+    //학생 신용등급 수정
+    @PatchMapping("/rating")
+    public ResponseEntity<ApiResponseDTO<NullType>> updateRating(@RequestBody StudentDTO studentDTO){
+        boolean success = studentService.updateRating(studentDTO);
+        String msg = success ? "학생 신용등급 수정에 성공하였습니다." : "학생 신용등급 수정에 실패하였습니다.";
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
+    }
+
     static class StudentData {
         @JsonProperty
         private final Long id;
