@@ -35,7 +35,7 @@ public class UserService {
 
     public Boolean create(UserDTO userDTO) {
 //        String encryptionPassword = passwordEncoder.encode(userDTO.getPw());
-        Optional<Users> userExist = userRepository.findByName(userDTO.getName());
+        Optional<Users> userExist = userRepository.findByUserId(userDTO.getUserId());
         if(userExist.isPresent()){
             return false;
         }
