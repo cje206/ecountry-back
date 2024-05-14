@@ -5,9 +5,11 @@ import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.entity.AccountLists;
 import com.growup.ecountry.entity.Countries;
+import com.growup.ecountry.entity.Jobs;
 import com.growup.ecountry.entity.Users;
 import com.growup.ecountry.repository.AccountListRepository;
 import com.growup.ecountry.repository.CountryRepository;
+import com.growup.ecountry.repository.JobRepository;
 import com.growup.ecountry.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
@@ -24,6 +26,7 @@ public class CountryService {
     private final CountryRepository countryRepository;
     private final UserRepository userRepository;
     private final AccountListRepository accountListRepository;
+    private final JobRepository jobRepository;
     private final TokenProvider jwt;
 
     //국가정보 조회
@@ -44,8 +47,8 @@ public class CountryService {
             return new ApiResponseDTO<>(false, "국가 리스트가 없습니다.", null);
         }
     }
-    //국가등록
-     public ApiResponseDTO<NullType> create(CountryDTO countryDTO, Long id){
+    //국가생성
+     public ApiResponseDTO<Long> create(CountryDTO countryDTO, Long id){
         Optional<Users> user = userRepository.findById(id);
          System.out.print(user);
         if(user.isPresent()){
@@ -57,9 +60,10 @@ public class CountryService {
                     .classroom(countryDTO.getClassroom())
                     .unit(countryDTO.getUnit())
                     .users(users).build();
-            Countries newCountry = countryRepository.save(countries);
-            accountListRepository.save(AccountLists.builder().division(false).name("입출금 통장").interest(0.0).available(true).build());
-            return  new ApiResponseDTO<>(true,"국가 생성 완료",null);
+            countryRepository.save(countries);
+            accountListRepository.save(AccountLists.builder().division(false).name("입출금 통장").interest(0.0).available(true).countryId(countries.getId()).build()); //countryId 추가 2
+            jobRepository.save(Jobs.builder().limited(50).name("무직").roll("무직").standard("무직").salary(0).countryId(countries.getId()).build());
+            return  new ApiResponseDTO<>(true,"국가 생성 완료",countries.getId());
         }
         else {
             return  new ApiResponseDTO<>(false,"국가 생성 실패",null);

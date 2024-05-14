@@ -38,7 +38,15 @@ public class Students {
     @Column(name = "country_id")
     private Long countryId;
 
-    public Students(Long countryId) {
+    @ManyToOne
+    @JoinColumn(name = "job_id", insertable = false, updatable = false)
+    private Jobs jobs;
+
+    @Column(name = "job_id")
+    private Long jobId;
+
+    public Students(Long countryId,Long jobId) {
         this.countryId = countryId;
+        this.jobId = jobId;
     }
 }
