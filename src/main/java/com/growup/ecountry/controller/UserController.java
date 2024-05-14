@@ -25,40 +25,52 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponseDTO<NullType>> signup(@RequestBody UserDTO userDTO) {
-        Boolean result = userService.create(userDTO);
-        String msg = result ? "회원가입에 성공하셨습니다" : "이미 존재하는 회원입니다";
-        return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
+        try {
+            Boolean result = userService.create(userDTO);
+            String msg = result ? "회원가입에 성공하셨습니다" : "이미 존재하는 회원입니다";
+            return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"회원가입 실패",null));
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseDTO<String>> login(@RequestBody UserDTO userDTO) {
-        ApiResponseDTO<Long> result = userService.login(userDTO);
-        Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(), false))
-                                          : new Token(null);
-        return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), token.getToken()));
+    public ResponseEntity<ApiResponseDTO<UserData2>> login(@RequestBody UserDTO userDTO) {
+        try {
+            ApiResponseDTO<Long> result = userService.login(userDTO);
+            Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(), false))
+                    : new Token(null);
+            return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), new UserData2(token.getToken())));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"로그인 실패",null));
+        }
     }
     //선생님/학생 개인정보조회
     @GetMapping("/info")
     public ResponseEntity<ApiResponseDTO<?>> userInfo(@RequestHeader(value = "Authorization") String token) {
-        TokenDTO authToken = jwt.validateToken(token);
-        if (authToken.getId() != 0) {
-            ApiResponseDTO<?> apiData = userService.userInfo(authToken.getId(), authToken.getIsStudent());
-            Object result = apiData.getResult();
-            if (result instanceof UserDTO) {
-                UserDTO userDTO = (UserDTO) result;
-                UserData userData = new UserData(userDTO.getId(), userDTO.getName(), userDTO.getUserId(), userDTO.getImg());
-                return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), userData));
-            } else if (result instanceof StudentDTO) {
-                StudentDTO studentDTO = (StudentDTO) result;
-                Optional<Jobs> jobExist = jobRepository.findById(studentDTO.getJobId());
-                if (jobExist.isPresent()) {
-                    Jobs studentJob = jobExist.get();
-                    StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),studentJob.getName(),studentDTO.getJobId());
-                    return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), studentData));
+        try {
+            TokenDTO authToken = jwt.validateToken(token);
+            if (authToken.getId() != 0) {
+                ApiResponseDTO<?> apiData = userService.userInfo(authToken.getId(), authToken.getIsStudent());
+                Object result = apiData.getResult();
+                if (result instanceof UserDTO) {
+                    UserDTO userDTO = (UserDTO) result;
+                    UserData userData = new UserData(userDTO.getId(), userDTO.getName(), userDTO.getUserId(), userDTO.getImg());
+                    return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), userData));
+                } else if (result instanceof StudentDTO) {
+                    StudentDTO studentDTO = (StudentDTO) result;
+                    Optional<Jobs> jobExist = jobRepository.findById(studentDTO.getJobId());
+                    if (jobExist.isPresent()) {
+                        Jobs studentJob = jobExist.get();
+                        StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),studentJob.getName(),studentDTO.getJobId());
+                        return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), studentData));
+                    }
                 }
             }
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "인증 실패", null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "인증 실패", null));
         }
-        return ResponseEntity.ok(new ApiResponseDTO<>(false, "인증 실패", null));
     }
 
     @GetMapping("/auth")
@@ -73,28 +85,40 @@ public class UserController {
 
     @PatchMapping("/change")
     public ResponseEntity<ApiResponseDTO<NullType>> pwUpdate(@RequestHeader(value= "Authorization") String token, @RequestBody UserDTO userDTO) {
-        TokenDTO authToken = jwt.validateToken(token);
-        if(authToken.getId() != 0){
-            Boolean result = userService.pwUpdate(authToken.getId(), userDTO.getPw());
-            String msg = result ? "비밀번호를 성공적으로 변경하였습니다" : "비밀번호 변경에 실패하였습니다";
-            return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
+        try {
+            TokenDTO authToken = jwt.validateToken(token);
+            if(authToken.getId() != 0){
+                Boolean result = userService.pwUpdate(authToken.getId(), userDTO.getPw());
+                String msg = result ? "비밀번호를 성공적으로 변경하였습니다" : "비밀번호 변경에 실패하였습니다";
+                return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
+            }
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"비밀번호 변경에 실패하였습니다",null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"비밀번호 변경에 실패하였습니다",null));
         }
-        return ResponseEntity.ok(new ApiResponseDTO<>(false,"비밀번호 변경에 실패하였습니다",null));
     }
 
 
     //이미지 변경
     @PatchMapping
     public ResponseEntity<ApiResponseDTO<NullType>> imgUpdate(@RequestBody UserDTO userDTO){
-        Boolean result = userService.imgUpdate(userDTO);
-        String msg = result ? "이미지 변경에 성공하였습니다" : "이미지 변경에 실패하였습니다";
-        return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
+        try {
+            Boolean result = userService.imgUpdate(userDTO);
+            String msg = result ? "이미지 변경에 성공하였습니다" : "이미지 변경에 실패하였습니다";
+            return ResponseEntity.ok(new ApiResponseDTO<>(result,msg,null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"이미지 변경에 실패하였습니다",null));
+        }
     }
 
     //국가리스트조회
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<List<CountryDTO>>> findCountryList(@PathVariable Long id){
-        return ResponseEntity.ok(userService.findCountryList(id));
+        try {
+            return ResponseEntity.ok(userService.findCountryList(id));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가리스트조회 실패",null));
+        }
     }
 
     static class Token{
@@ -121,6 +145,13 @@ public class UserController {
             this.name = name;
             this.userId = userId;
             this.img = img;
+        }
+    }
+    static class UserData2 {
+        @JsonProperty
+        private final String token;
+        private UserData2(String token) {
+            this.token = token;
         }
     }
     // 직업id로 직업테이블의 직업을 뽑아와야함

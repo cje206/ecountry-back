@@ -23,28 +23,40 @@ public class CountryController {
     //국가정보 조회
     @GetMapping("/{countryId}")
     public ResponseEntity<ApiResponseDTO<CountryData>> findAllCountries(@PathVariable Long countryId){
-        ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(countryId);
-        CountryDTO countryDTO = apiData.getResult();
-        return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(),apiData.getMessage(), new CountryData(countryDTO.getName(), countryDTO.getGrade(), countryDTO.getClassroom(), countryDTO.getSalaryDate(), countryDTO.getSchool(), countryDTO.getTreasury())));
+        try {
+            ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(countryId);
+            CountryDTO countryDTO = apiData.getResult();
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(),apiData.getMessage(), new CountryData(countryDTO.getName(), countryDTO.getGrade(), countryDTO.getClassroom(), countryDTO.getSalaryDate(), countryDTO.getSchool(), countryDTO.getTreasury())));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가정보 조회 실패",null));
+        }
     }
 
     //국가생성
      @PostMapping
      public ResponseEntity<ApiResponseDTO<CountryData2>> create(@RequestHeader(value = "Authorization") String token, @RequestBody CountryDTO countryDTO){
-         TokenDTO authToken = jwt.validateToken(token);
-         if(authToken.getId() != 0) {
-             ApiResponseDTO<Long> apiData = countryService.create(countryDTO, authToken.getId());
-            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),  new CountryData2(apiData.getResult())));
-         }
-         else {
+        try {
+            TokenDTO authToken = jwt.validateToken(token);
+            if(authToken.getId() != 0) {
+                ApiResponseDTO<Long> apiData = countryService.create(countryDTO, authToken.getId());
+                return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),  new CountryData2(apiData.getResult())));
+            }
+            else {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 생성 실패",null));
+            }
+        } catch (Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 생성 실패",null));
-         }
+        }
      }
 
     //국가삭제
      @DeleteMapping("/{id}")
      public ResponseEntity<ApiResponseDTO<NullType>> delete(@PathVariable Long id){
-        return ResponseEntity.ok(countryService.delete(id));
+        try{
+            return ResponseEntity.ok(countryService.delete(id));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 삭제 실패",null));
+        }
     }
 
     static class CountryData {
@@ -55,25 +67,25 @@ public class CountryController {
         @JsonProperty
         private final Integer classroom;
         @JsonProperty
-        private final Integer salary_date;
+        private final Integer salaryDate;
         @JsonProperty
         private final String school;
         @JsonProperty
         private final Integer treasury;
-        public CountryData(String name, Integer grade, Integer classroom, Integer salary_date, String school, Integer treasury) {
+        public CountryData(String name, Integer grade, Integer classroom, Integer salaryDate, String school, Integer treasury) {
             this.name = name;
             this.grade = grade;
             this.classroom = classroom;
-            this.salary_date = salary_date;
+            this.salaryDate = salaryDate;
             this.school = school;
             this.treasury = treasury;
         }
     }
     static class CountryData2 {
         @JsonProperty
-        private final Long country_id;
-        public CountryData2(Long country_id) {
-            this.country_id = country_id;
+        private final Long id;
+        public CountryData2(Long id) {
+            this.id = id;
         }
     }
 }

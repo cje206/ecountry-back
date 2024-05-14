@@ -63,6 +63,7 @@ public class BankService {
         Students student = studentRepository.findByIdANDCountryId(studentId, countryId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
         Jobs jobs = jobRepository.findById(student.getJobId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다"));
         List<Accounts> accounts = accountRepository.findByStudentId(student.getId());
+        // Bank.id 로 조회하기
         Banks banks = Banks.builder()
                 .transaction(jobs.getSalary())
                 .memo("월급")
