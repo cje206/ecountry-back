@@ -44,6 +44,10 @@ public class Jobs {
     @OneToMany(mappedBy = "jobs", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<JobDetails> jobDetails = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "jobs")
+    private List<Students> students = new ArrayList<>();
+
     public Jobs(Long countryId){
         this.countryId = countryId;
     }

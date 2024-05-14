@@ -4,15 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @Builder
-public class AccountListDTO {
+public class AccountDTO {
     private Long id;
-    private Boolean division;
+    private Integer balance;
+    private Timestamp createdAt;
+    private Long studentId;
+    private Long accountListId;
     private String name;
-    private Double interest;
-    private Integer dueDate;
-    private Boolean available;
-    private Long countryId;
 }
