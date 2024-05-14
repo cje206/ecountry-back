@@ -79,5 +79,14 @@ public class AccountController {
         return ResponseEntity.ok(new ApiResponseDTO<List<AccountService.SavingList>>(true, "가입된 적금리스트 정보 조회에 성공하였습니다.", savingLists));
     }
 
+    //적금해지
+    @DeleteMapping("/saving/{countryId}")
+    public ResponseEntity<ApiResponseDTO<NullType>> closeSaving(@RequestHeader(value = "Authorization") String token, @RequestBody AccountDTO accountDTO, @PathVariable Long countryId){
+        TokenDTO authToken = jwt.validateToken(token);
+        boolean success = accountService.closeSaving(countryId, authToken.getId(), accountDTO);
+        String msg = success ? "적금통장 해지에 성공하였습니다." : "적금통장 해지에 실패하였습니다. ";
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
+    }
+
 
 }
