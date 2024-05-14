@@ -27,7 +27,7 @@ public class AccountLists {
     @Column(nullable = false)
     private Double interest;
 
-    @Column(nullable = false)
+//    @Column(nullable = false) -> Null
     private Integer dueDate;
 
     @Column(columnDefinition = "TINYINT(1) default 1", nullable = false)

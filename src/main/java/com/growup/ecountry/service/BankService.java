@@ -57,8 +57,4 @@ public class BankService {
         return accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
                 .id(account.getId()).name(getStudentName(account.getId())).build()).collect(Collectors.toList());
     }
-
-
-
-
 }

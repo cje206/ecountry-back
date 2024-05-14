@@ -2,23 +2,25 @@ package com.growup.ecountry.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.config.TokenProvider;
-import com.growup.ecountry.dto.ApiResponseDTO;
-import com.growup.ecountry.dto.CountryDTO;
-import com.growup.ecountry.dto.TokenDTO;
-import com.growup.ecountry.dto.UserDTO;
+import com.growup.ecountry.dto.*;
+import com.growup.ecountry.entity.Jobs;
+import com.growup.ecountry.repository.JobRepository;
 import com.growup.ecountry.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.lang.model.type.NullType;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final JobRepository jobRepository;
     private final TokenProvider jwt;
 
     @PostMapping("/signup")
@@ -34,6 +36,29 @@ public class UserController {
         Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(), false))
                                           : new Token(null);
         return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), token.getToken()));
+    }
+    //선생님/학생 개인정보조회
+    @GetMapping("/info")
+    public ResponseEntity<ApiResponseDTO<?>> userInfo(@RequestHeader(value = "Authorization") String token) {
+        TokenDTO authToken = jwt.validateToken(token);
+        if (authToken.getId() != 0) {
+            ApiResponseDTO<?> apiData = userService.userInfo(authToken.getId(), authToken.getIsStudent());
+            Object result = apiData.getResult();
+            if (result instanceof UserDTO) {
+                UserDTO userDTO = (UserDTO) result;
+                UserData userData = new UserData(userDTO.getId(), userDTO.getName(), userDTO.getUserId(), userDTO.getImg());
+                return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), userData));
+            } else if (result instanceof StudentDTO) {
+                StudentDTO studentDTO = (StudentDTO) result;
+                Optional<Jobs> jobExist = jobRepository.findById(studentDTO.getJobId());
+                if (jobExist.isPresent()) {
+                    Jobs studentJob = jobExist.get();
+                    StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),studentJob.getName(),studentDTO.getJobId());
+                    return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), studentData));
+                }
+            }
+        }
+        return ResponseEntity.ok(new ApiResponseDTO<>(false, "인증 실패", null));
     }
 
     @GetMapping("/auth")
@@ -80,6 +105,48 @@ public class UserController {
         }
         public String getToken(){
             return this.token;
+        }
+    }
+    static class UserData {
+        @JsonProperty
+        private final Long id;
+        @JsonProperty
+        private final String name;
+        @JsonProperty
+        private final String userId;
+        @JsonProperty
+        private final String img;
+        public UserData(Long id, String name, String userId, String img) {
+            this.id = id;
+            this.name = name;
+            this.userId = userId;
+            this.img = img;
+        }
+    }
+    // 직업id로 직업테이블의 직업을 뽑아와야함
+    static class StudentData {
+        @JsonProperty
+        private final Long id;
+        @JsonProperty
+        private final String name;
+        @JsonProperty
+        private final Integer rollNumber;
+        @JsonProperty
+        private final Integer rating;
+        @JsonProperty
+        private final String img;
+        @JsonProperty
+        private final String job;
+        @JsonProperty
+        private final Long jobId;
+        public StudentData(Long id, String name, Integer rollNumber, Integer rating, String img,String job, Long jobId) {
+            this.id = id;
+            this.name = name;
+            this.rollNumber = rollNumber;
+            this.rating = rating;
+            this.img = img;
+            this.job = job;
+            this.jobId = jobId;
         }
     }
 }

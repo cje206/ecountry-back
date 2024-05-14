@@ -1,5 +1,6 @@
 package com.growup.ecountry.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.config.TokenProvider;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.CountryDTO;
@@ -27,10 +28,12 @@ public class CountryController {
 
     //국가생성
      @PostMapping
-     public ResponseEntity<ApiResponseDTO<NullType>> create(@RequestHeader(value = "Authorization") String token, @RequestBody CountryDTO countryDTO){
+     public ResponseEntity<ApiResponseDTO<Long>> create(@RequestHeader(value = "Authorization") String token, @RequestBody CountryDTO countryDTO){
          TokenDTO authToken = jwt.validateToken(token);
          if(authToken.getId() != 0) {
-            return ResponseEntity.ok(countryService.create(countryDTO, authToken.getId()));
+             ApiResponseDTO<Long> apiData = countryService.create(countryDTO, authToken.getId());
+             CountryData countryData = new CountryData(apiData.getResult());
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), countryData.countryId));
          }
          else {
             return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가 생성 실패",null));
@@ -41,5 +44,13 @@ public class CountryController {
      @DeleteMapping("/{id}")
      public ResponseEntity<ApiResponseDTO<NullType>> delete(@PathVariable Long id){
         return ResponseEntity.ok(countryService.delete(id));
+    }
+
+    static class CountryData {
+        @JsonProperty
+        private final Long countryId;
+        public CountryData(Long countryId) {
+            this.countryId = countryId;
+        }
     }
 }

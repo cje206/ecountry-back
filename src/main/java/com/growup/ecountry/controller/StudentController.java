@@ -6,6 +6,8 @@ import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.NoticeDTO;
 import com.growup.ecountry.dto.StudentDTO;
 import com.growup.ecountry.dto.TokenDTO;
+import com.growup.ecountry.entity.Jobs;
+import com.growup.ecountry.repository.JobRepository;
 import com.growup.ecountry.service.StudentService;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.lang.model.type.NullType;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentController {
     private final StudentService studentService;
+    private final JobRepository jobRepository;
     private final TokenProvider jwt;
 
     //국민등록(수기)
@@ -44,7 +49,8 @@ public class StudentController {
         ApiResponseDTO<List<StudentDTO>> apiData = studentService.studentList(countryId);
         List<StudentDTO> students = apiData.getResult();
         for(StudentDTO student : students) {
-            StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating());
+            Jobs studentJob = jobRepository.findById(student.getJobId()).get();
+            StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),studentJob.getName(),student.getJobId());
             studentDataList.add(studentData);
         }
         return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),studentDataList));
@@ -56,8 +62,8 @@ public class StudentController {
     }
     //국민수정
     @PatchMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<NullType>> studentUpdate(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
-        return ResponseEntity.ok(studentService.studentUpdate(countryId,studentDTO));
+    public ResponseEntity<ApiResponseDTO<NullType>> studentUpdate(@PathVariable Long countryId,@RequestBody List<StudentDTO> studentDTOs){
+        return ResponseEntity.ok(studentService.studentUpdate(countryId,studentDTOs));
     }
     //학생로그인
     @PostMapping("/user/{countryId}")
@@ -83,15 +89,33 @@ public class StudentController {
         return ResponseEntity.ok(studentService.studentImgUpdate(countryId,studentDTO));
     }
     //알림조회
-//    @GetMapping("/notice/{studentId}")
-//    public ResponseEntity<ApiResponseDTO> noticeCheck(@PathVariable Long studentId){
-//
-//    }
-    //알림추가
-    @PostMapping("/notice/add")
-    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@RequestBody NoticeDTO noticeDTO){
-        return ResponseEntity.ok(studentService.noticeAdd(noticeDTO));
+    @GetMapping("/notice")
+    public ResponseEntity<ApiResponseDTO<List<NoticeData>>> noticeCheck(@RequestHeader("Authorization") String token){
+        List<NoticeData> noticeDataList = new ArrayList<>();
+        TokenDTO authToken = jwt.validateToken(token);
+        if(authToken != null){
+            ApiResponseDTO<List<NoticeDTO>> apiData = studentService.noticeList(authToken.getId());
+            List<NoticeDTO> notices = apiData.getResult();
+            for(NoticeDTO notice : notices) {
+                if(notice.getIsChecked() == false){
+                    NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
+                    noticeDataList.add(noticeData);
+                }
+                else { // 이미 조회한걸 다시 보는 경우
+                    NoticeData noticeData = new NoticeData(notice.getId(), notice.getContent(), 1, notice.getCreatedAt());
+                    noticeDataList.add(noticeData);
+                }
+            }
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),noticeDataList));
+        }
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"사용자 인증에 실패하였습니다",noticeDataList));
     }
+    //알림추가
+    @PostMapping("/notice/add/{countryId}")
+    public ResponseEntity<ApiResponseDTO<NullType>> noticeAdd(@PathVariable Long countryId,@RequestBody NoticeDTO noticeDTO){
+        return ResponseEntity.ok(studentService.noticeAdd(countryId,noticeDTO));
+    }
+
     static class StudentData {
         @JsonProperty
         private final Long id;
@@ -101,11 +125,34 @@ public class StudentController {
         private final Integer rollNumber;
         @JsonProperty
         private final Integer rating;
-        public StudentData(Long id, String name, Integer rollNumber, Integer rating) {
+        @JsonProperty
+        private final String job;
+        @JsonProperty
+        private final Long jobId;
+        public StudentData(Long id, String name, Integer rollNumber, Integer rating, String job, Long jobId) {
             this.id = id;
             this.name = name;
             this.rollNumber = rollNumber;
             this.rating = rating;
+            this.job = job;
+            this.jobId = jobId;
+        }
+    }
+
+    static class NoticeData {
+        @JsonProperty
+        private final Long id;
+        @JsonProperty
+        private final String content;
+        @JsonProperty
+        private final Integer isChecked;
+        @JsonProperty
+        private final Date createAt;
+        public NoticeData(Long id, String content, Integer isChecked, Date createAt) {
+            this.id = id;
+            this.content = content;
+            this.isChecked = isChecked;
+            this.createAt = createAt;
         }
     }
 

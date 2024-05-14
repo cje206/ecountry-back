@@ -67,4 +67,9 @@ public class BankController {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "입출금 통장 조회 실패"));
         }
     }
+    //월급명세서
+    @GetMapping("/paystub/")
+    public ResponseEntity<ApiResponseDTO<NullType>> getPaystub(@RequestHeader(value = "Authorization") String token) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "월급명세서"));
+    }
 }
