@@ -92,8 +92,10 @@ public class AccountService {
         for(Accounts accounts :accountsList){
             SavingList savingList = new SavingList(accounts.getId(),accounts.getBalance(),accounts.getCreatedAt());
             AccountLists savingAccountInfo = accountListRepository.findById(accounts.getAccountListId()).orElseThrow();
-            savingList.setInterestAndDueDate(savingAccountInfo.getInterest(), savingAccountInfo.getDueDate());
-            savingLists.add(savingList);
+            if(savingAccountInfo.getDueDate() != null) {
+                savingList.setInterestAndDueDate(savingAccountInfo.getInterest(), savingAccountInfo.getDueDate());
+                savingLists.add(savingList);
+            }
         }
         return savingLists ;
     }
