@@ -9,10 +9,10 @@ import lombok.Setter;
 @Builder
 public class AccountListDTO {
     private Long id;
-    private boolean division;
+    private Boolean division;
     private String name;
     private Double interest;
     private Integer dueDate;
-    private boolean available;
+    private Boolean available;
     private Long countryId;
 }
