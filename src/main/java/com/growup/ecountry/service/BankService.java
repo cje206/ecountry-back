@@ -82,16 +82,27 @@ public class BankService {
             paystubDTOList.add(salaryDTO);
             return new ApiResponseDTO<>(true, "무직의 월급명세서", paystubDTOList);
         }
+        // + - 다 더해서 원금 뜰수있게
         Jobs jobs = jobRepository.findById(student.getJobId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다"));
         Integer salary = jobs.getSalary(); //월급
         List<Taxes> taxes = taxRepository.findByCountryId(student.getCountryId());
         List<PaystubDTO> paystubDTOList = new ArrayList<>();
         for(Taxes tax : taxes) {
-            PaystubDTO paystubDTO = PaystubDTO.builder()
-                    .title(tax.getName())
-                    .value(Integer.valueOf((int)Math.floor(- tax.getTax())))
-                    .build();
-            paystubDTOList.add(paystubDTO);
+            if(tax.getDivision() == 0) {
+                PaystubDTO paystubDTO = PaystubDTO.builder()
+                        .title(tax.getName())
+                        .value(Integer.valueOf((int)Math.round(-(salary * tax.getTax() / 100)))) // % 비율
+                        .build();
+                paystubDTOList.add(paystubDTO);
+            }
+            else {
+                PaystubDTO paystubDTO = PaystubDTO.builder()
+                        .title(tax.getName())
+                        .value(Integer.valueOf((int)Math.floor(-(tax.getTax())))) // 그외 나머지 고정금액
+                        .build();
+                paystubDTOList.add(paystubDTO);
+            }
+
         }
         PaystubDTO salaryDTO = PaystubDTO.builder()
                 .title("월급")
@@ -113,7 +124,7 @@ public class BankService {
             List<Taxes> taxes = taxRepository.findByCountryId(student.getCountryId());
             for(Taxes tax : taxes) {
                 if(tax.getDivision() == 0) {
-                    actualSalary = Integer.valueOf((int)Math.floor(actualSalary - (actualSalary * tax.getTax() / 100)));
+                    actualSalary = Integer.valueOf((int)Math.round(actualSalary - (actualSalary * tax.getTax() / 100)));
                 }
                 else if(tax.getDivision() == 1) {
                     actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
