@@ -22,13 +22,19 @@ public class CountryController {
 
     //국가정보 조회
     @GetMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<CountryData>> findAllCountries(@PathVariable Long countryId){
+    public ResponseEntity<ApiResponseDTO<CountryData>> findAllCountries(@RequestHeader(value = "Authorization") String token,@PathVariable Long countryId){
         try {
-            ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(countryId);
-            CountryDTO countryDTO = apiData.getResult();
-            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(),apiData.getMessage(), new CountryData(countryDTO.getName(), countryDTO.getGrade(), countryDTO.getClassroom(), countryDTO.getSalaryDate(), countryDTO.getSchool(), countryDTO.getTreasury())));
+            TokenDTO authToken = jwt.validateToken(token);
+            if (authToken.getId() != 0 && authToken.getIsStudent() == false) {
+                ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(authToken.getId(),countryId);
+                CountryDTO countryDTO = apiData.getResult();
+                return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(),apiData.getMessage(), new CountryData(countryDTO.getName(), countryDTO.getGrade(), countryDTO.getClassroom(), countryDTO.getSalaryDate(), countryDTO.getSchool(), countryDTO.getTreasury())));
+            }
+            else {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가정보 조회 실패",null));
+            }
         } catch (Exception e) {
-            return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가정보 조회 실패",null));
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,e.getMessage(),null));
         }
     }
 
