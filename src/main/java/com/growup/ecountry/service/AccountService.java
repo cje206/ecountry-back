@@ -1,5 +1,6 @@
 package com.growup.ecountry.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.dto.AccountDTO;
 import com.growup.ecountry.dto.AccountListDTO;
 import com.growup.ecountry.dto.BankDTO;
@@ -59,13 +60,39 @@ public class AccountService {
         return accountListRepository.save(list);
     }
 
-    public List<AccountDTO> getAccount(Long studentId) {
+    //전체 통장조회
+    public List<AccountInfo> getAccount(Long studentId) {
         System.out.println(accountRepository.findByStudentId(studentId));
-        return accountRepository.findByStudentId(studentId).stream().map(account -> AccountDTO.builder().id(account.getId())
-                .balance(account.getBalance()).createdAt(account.getCreatedAt())
-                .studentId(account.getStudentId()).accountListId(account.getAccountListId())
-                .build()).collect(Collectors.toList());
+        List<AccountInfo> accountInfoList =  new ArrayList<>();
+        try {
+            List<AccountDTO> accountDTOList = accountRepository.findByStudentId(studentId).stream().map(account -> AccountDTO.builder().id(account.getId())
+                    .balance(account.getBalance()).createdAt(account.getCreatedAt())
+                    .studentId(account.getStudentId()).accountListId(account.getAccountListId()).build()).toList();
+            for(AccountDTO accountDTO :accountDTOList){
+                AccountInfo accountInfo = new AccountInfo(accountDTO.getId(),accountDTO.getBalance(),accountDTO.getCreatedAt());
+                AccountLists accountListDTO = accountListRepository.findById(accountDTO.getAccountListId()).orElseThrow();
+                accountInfo.setting(accountListDTO.getName(),accountListDTO.getDivision(),accountListDTO.getInterest(),accountListDTO.getDueDate());
+                accountInfoList.add(accountInfo);
+            }
+         } catch (Exception e){
+            System.out.println("전체 통장리스트 오류 : " + e.getMessage());
+        }
+        return accountInfoList;
+    }
 
+    //통장상세정보 조회
+    public AccountInfo getAccountDetail(Long id) {
+        try {
+            Accounts account = accountRepository.findById(id).orElseThrow();
+            AccountLists accountList = accountListRepository.findById(account.getAccountListId()).orElseThrow();
+            AccountInfo accountInfo =new AccountInfo(account.getId(),account.getBalance(),account.getCreatedAt());
+            accountInfo.setting(accountList.getName(),accountList.getDivision(), accountList.getInterest(),accountList.getDueDate());
+            return accountInfo;
+
+        } catch (Exception e){
+            System.out.println("통장 정보 상세조회 오류 : " + e.getMessage());
+            return null;
+        }
     }
 
     //적금가입
@@ -174,4 +201,34 @@ public class AccountService {
 
         }
     }
+
+    public static class AccountInfo{
+        @JsonProperty
+        private Long id;
+        @JsonProperty
+        private Integer balance;
+        @JsonProperty
+        private Timestamp createdAt;
+        @JsonProperty
+        private String accountName;
+        @JsonProperty
+        private String  division;
+        @JsonProperty
+        private Double interest;
+        @JsonProperty
+        private Integer dueDate;
+
+        public AccountInfo(Long id, Integer balance, Timestamp createdAt){
+            this.id = id;
+            this.balance = balance;
+            this.createdAt = createdAt;
+        }
+        public void setting(String accountName, Boolean type, Double interest, Integer dueDate){
+            this.division = type ?  "적금통장" :  "입출금통장";
+            this.dueDate = dueDate;
+            this.accountName = accountName;
+            this.interest = interest;
+        }
+    }
+
 }
