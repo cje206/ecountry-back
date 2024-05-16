@@ -50,7 +50,7 @@ public class StudentService {
                         .pw(student.getPw())
                         .img(student.getImg())
                         .countryId(countries.getId())
-                        .jobId(1L).build();
+                        .jobId(null).build();
                 studentRepository.save(studentEntity);
                 List<AccountLists> accountInfo = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true);
                 if(!accountInfo.isEmpty()){
@@ -92,7 +92,7 @@ public class StudentService {
                                     .name(columns[1])
                                     .pw(columns[2])
                                     .countryId(countries.getId())
-                                    .jobId(1L).build();
+                                    .jobId(null).build();
                     studentRepository.save(student);
                     List<AccountLists> accountInfo = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true);
                     if(!accountInfo.isEmpty()){

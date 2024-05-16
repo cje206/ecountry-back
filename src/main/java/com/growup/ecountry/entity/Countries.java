@@ -38,7 +38,7 @@ public class Countries {
     @ColumnDefault("0")
     private Integer treasury;
 
-    @ColumnDefault("25")
+    @Column(nullable = false)
     private Integer salaryDate;
 
     @ManyToOne

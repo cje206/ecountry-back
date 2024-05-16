@@ -59,10 +59,10 @@ public class CountryService {
                     .grade(countryDTO.getGrade())
                     .classroom(countryDTO.getClassroom())
                     .unit(countryDTO.getUnit())
+                    .salaryDate(countryDTO.getSalaryDate())
                     .users(users).build();
             countryRepository.save(countries);
-            accountListRepository.save(AccountLists.builder().division(false).name("입출금 통장").interest(0.0).available(true).countryId(countries.getId()).build()); //countryId 추가 2
-            jobRepository.save(Jobs.builder().limited(50).name("무직").roll("무직").standard("무직").salary(0).countryId(countries.getId()).build());
+            accountListRepository.save(AccountLists.builder().division(false).name("입출금 통장").interest(0.0).available(true).countryId(countries.getId()).build());
             return  new ApiResponseDTO<>(true,"국가 생성 완료",countries.getId());
         }
         else {
