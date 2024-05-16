@@ -28,7 +28,7 @@ public class Banks {
     private String memo;
 
 //    0일 경우 과태료 x / 과태료인 경우 countryId
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "BIGINT default 0")
+    @Column(nullable = false, updatable = true, insertable = true, columnDefinition = "BIGINT default 0")
     private Long isPenalty;
 
     @ManyToOne

@@ -1,16 +1,17 @@
 package com.growup.ecountry.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.growup.ecountry.dto.ApiResponseDTO;
-import com.growup.ecountry.dto.RuleDTO;
-import com.growup.ecountry.dto.TaxDTO;
+import com.growup.ecountry.dto.*;
+import com.growup.ecountry.service.CountryService;
 import com.growup.ecountry.service.TaxService;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.lang.model.type.NullType;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TaxController {
     public  final TaxService taxService;
+    public final CountryService countryService;
 
     //세금리스트 등록
     @PostMapping()
@@ -64,7 +66,75 @@ public class TaxController {
 
         return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
+    //국고 조회
+    @GetMapping("/treasury/{countryId}")
+    public ResponseEntity<ApiResponseDTO<?>> findTreasury(@PathVariable Long countryId){
+        CountryDTO countryDTO = countryService.findTreasury(countryId);
+        if(countryDTO == null){
+            return ResponseEntity.ok(new ApiResponseDTO<NullType>(false, "국고 조회에 실패하였습니다."));
+        }else {
+            Treasury responseTreasury = new Treasury(countryDTO.getTreasury());
+            return ResponseEntity.ok(new ApiResponseDTO<Treasury>(true, "국고 조회에 성공하였습니다.",responseTreasury));
+        }
+    }
+    //과태료 조회
+    @GetMapping("/penalty/{countryId}")
+    public ResponseEntity<ApiResponseDTO<List<Penalty>>> findAllPenaltyList(@PathVariable Long countryId){
+        try {
+            List<Penalty> penalties = taxService.findPenalty(countryId).stream().map(penalty -> Penalty.builder().id(penalty.getId()).memo(penalty.getMemo()).createdAt(penalty.getCreatedAt()).transaction(penalty.getTransaction()).build()).toList();
+            return ResponseEntity.ok(new ApiResponseDTO<List<Penalty>>(true, "과태료 조회에 성공하였습니다.", penalties));
 
+        }catch (Exception e){
+            System.out.println("과태표 조회 controller 오류 : " + e.getMessage());
+            return ResponseEntity.ok(new ApiResponseDTO<List<Penalty>>(false, "과태료 조회에 실패하였습니다.", null));
+        }
+    }
+
+    //과태료 부과
+    @PostMapping("/penalty/{countryId}")
+    public ResponseEntity<ApiResponseDTO<NullType>> imposePenalty(@PathVariable Long countryId, @RequestBody BankDTO bankDTO){
+        boolean success = taxService.imposePenalty(countryId, bankDTO);
+        String msg = success ? "과태료 부과에 성공하였습니다." : "과태료 부과에 실패하였습니다.";
+
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
+    }
+
+    //과태료 삭제
+    @DeleteMapping("/penalty/{id}")
+    public ResponseEntity<ApiResponseDTO<NullType>> deletePenalty(@PathVariable Long id){
+        boolean success = taxService.deletePenalty(id);
+        String msg = success ? "과태료 삭제에 성공하였습니다." : "과태료 삭제에 실패하였습니다.";
+
+        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
+    }
+
+    @Builder
+    static class Penalty{
+        @JsonProperty
+        private Long id;
+        @JsonProperty
+        private Integer transaction;
+        @JsonProperty
+        private String memo ;
+        @JsonProperty
+        private Timestamp createdAt;
+
+        public Penalty(Long id, Integer transaction, String memo, Timestamp createdAt) {
+            this.id = id;
+            this.transaction = transaction;
+            this.memo = memo;
+            this.createdAt = createdAt;
+        }
+    }
+
+
+    static class Treasury{
+        @JsonProperty
+        private Integer treasury;
+        public Treasury(Integer treasury){
+            this.treasury = treasury;
+        }
+    }
     static class FindAllTaxes{
         @JsonProperty
         private Long id;

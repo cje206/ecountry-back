@@ -33,7 +33,7 @@ public class BankService {
 
         Banks result = bankRepository.save(Banks.builder().transaction(bankDTO.getTransaction())
                 .memo(bankDTO.getMemo()).depositId(bankDTO.getDepositId())
-                .withdrawId(bankDTO.getWithdrawId()).build());
+                .withdrawId(bankDTO.getWithdrawId()).isPenalty(0L).build());
         Accounts deposit = accountRepository.findById(bankDTO.getDepositId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
         deposit.setBalance(deposit.getBalance()+bankDTO.getTransaction());
         accountRepository.save(deposit);
