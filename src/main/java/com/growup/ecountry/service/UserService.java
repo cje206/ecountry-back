@@ -50,18 +50,12 @@ public class UserService {
     }
 
     public ApiResponseDTO<Long> login(UserDTO userDTO) {
-        Optional<Users> userIdExist = userRepository.findByUserId(userDTO.getUserId());
-        if(userIdExist.isPresent()){
-            Optional<Users> userPwExist = userRepository.findByPw(userDTO.getPw());
-            if(userPwExist.isPresent()){
-                return new ApiResponseDTO<>(true,"로그인 성공",userIdExist.get().getId());
-            }
-            else {
-                return new ApiResponseDTO<>(false,"비밀번호를 잘못 입력하셨습니다",null);
-            }
+        Optional<Users> userExist = userRepository.findByUserIdAndPw(userDTO.getUserId(),userDTO.getPw());
+        if(userExist.isPresent()){
+                return new ApiResponseDTO<>(true,"로그인 성공",userExist.get().getId());
         }
         else {
-            return new ApiResponseDTO<>(false,"아이디를 잘못 입력하셨습니다",null);
+            return new ApiResponseDTO<>(false,"존재하지 않는 회원입니다",null);
         }
     }
     //선생님/학생 정보 조회
@@ -86,14 +80,26 @@ public class UserService {
             Optional<Students> studentEXIST = studentRepository.findById(id);
             if(studentEXIST.isPresent()){
                 Students student = studentEXIST.get();
-                StudentDTO studentDTO = StudentDTO.builder()
-                        .id(student.getId())
-                        .name(student.getName())
-                        .rollNumber(student.getRollNumber())
-                        .rating(student.getRating())
-                        .img(student.getImg())
-                        .jobId(student.getJobId()).build();
-                return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
+                if(student.getJobId() == null){
+                    StudentDTO studentDTO = StudentDTO.builder()
+                            .id(student.getId())
+                            .name(student.getName())
+                            .rollNumber(student.getRollNumber())
+                            .rating(student.getRating())
+                            .img(student.getImg())
+                            .jobId(null).build();
+                    return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
+                }
+                else {
+                    StudentDTO studentDTO = StudentDTO.builder()
+                            .id(student.getId())
+                            .name(student.getName())
+                            .rollNumber(student.getRollNumber())
+                            .rating(student.getRating())
+                            .img(student.getImg())
+                            .jobId(student.getJobId()).build();
+                    return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
+                }
             }
             else {
                 return new ApiResponseDTO<>(false, "존재하지 않는 학생입니다", null);

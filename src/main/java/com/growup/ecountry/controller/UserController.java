@@ -42,7 +42,7 @@ public class UserController {
                     : new Token(null);
             return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), new UserData2(token.getToken())));
         } catch (Exception e) {
-            return ResponseEntity.ok(new ApiResponseDTO<>(false,"로그인 실패",null));
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,e.getMessage(),null));
         }
     }
     //선생님/학생 개인정보조회
@@ -59,6 +59,11 @@ public class UserController {
                     return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), userData));
                 } else if (result instanceof StudentDTO) {
                     StudentDTO studentDTO = (StudentDTO) result;
+                    //jobName: 무직, jobId: null
+                    if(studentDTO.getJobId() == null) {
+                        StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),"무직",studentDTO.getJobId());
+                        return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), studentData));
+                    }
                     Optional<Jobs> jobExist = jobRepository.findById(studentDTO.getJobId());
                     if (jobExist.isPresent()) {
                         Jobs studentJob = jobExist.get();

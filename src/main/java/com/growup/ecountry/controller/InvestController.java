@@ -84,7 +84,6 @@ public class InvestController {
     
     @DeleteMapping("/status/{id}")
     public ResponseEntity<ApiResponseDTO<NullType>> deleteStatus(@PathVariable Long id) {
-
         try {
             investService.deleteStatus(id);
             return ResponseEntity.ok(new ApiResponseDTO<NullType>(true, "투자 정보 삭제 완료"));
