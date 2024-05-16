@@ -1,10 +1,12 @@
 package com.growup.ecountry.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.dto.AccountDTO;
 import com.growup.ecountry.dto.BankDTO;
 import com.growup.ecountry.dto.TaxDTO;
 import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.*;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -78,7 +80,7 @@ public class TaxService {
         }
         return true;
     }
-    //과태료 조회
+    //과태료 부과된 학생 조회
     public List<BankDTO> findPenalty(Long countryId){
         List<Banks> penaltyList = bankRepository.findByIsPenalty(countryId);
         List<BankDTO> panaltyDTOList = new ArrayList<>();
@@ -88,6 +90,18 @@ public class TaxService {
             System.out.println("과태료 조회 오류 : " + e.getMessage());
         }
         return panaltyDTOList;
+    }
+    //과태료 리스트 조회
+    public List<PenaltyList> findPenaltyList(Long countryId){
+        try {
+            List<Taxes> taxesList = taxRepository.findByCountryIdAndDivision(countryId, 3);
+            return taxesList.stream().map(tax ->
+                    PenaltyList.builder().taxName(tax.getName()).tax(tax.getTax()).build()
+            ).toList();
+        }catch (Exception e){
+            System.out.println("과태료 리스트 조회 오류 : "+e.getMessage());
+            return null;
+        }
     }
     //과태료 부과
     public Boolean imposePenalty(Long countryId,BankDTO bankDTO){
@@ -141,6 +155,14 @@ public class TaxService {
             return false;
         }
         return true;
+    }
+
+    @Builder
+    public static class PenaltyList{
+        @JsonProperty
+        private String taxName ;
+        @JsonProperty
+        private Double tax;
     }
 
 }

@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.lang.model.type.NullType;
@@ -88,6 +89,16 @@ public class TaxController {
             System.out.println("과태표 조회 controller 오류 : " + e.getMessage());
             return ResponseEntity.ok(new ApiResponseDTO<List<Penalty>>(false, "과태료 조회에 실패하였습니다.", null));
         }
+    }
+    //과태료 리스트 조회
+    @GetMapping("/penalty/list/{countryId}")
+    public ResponseEntity<ApiResponseDTO<List<TaxService.PenaltyList>>> findPenaltyList(@PathVariable Long countryId){
+            List<TaxService.PenaltyList> penaltyList = taxService.findPenaltyList(countryId);
+            if(penaltyList != null) {
+                return ResponseEntity.ok(new ApiResponseDTO<List<TaxService.PenaltyList>>(true, "과태료 리스트조회에 성공하였습니다.", penaltyList));
+            } else {
+                return ResponseEntity.ok(new ApiResponseDTO<List<TaxService.PenaltyList>>(false, "과태료 리스트조회에 실패하였습니다."));
+            }
     }
 
     //과태료 부과
