@@ -23,8 +23,9 @@ public class BankController {
     private final BankService bankService;
     private final TokenProvider jwt;
 
+    //전체통장리스트 조회
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<AccountDTO>>> getAccount(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResponseDTO<List<AccountService.AccountInfo>>> getAccount(@RequestHeader(value = "Authorization") String token) {
         try {
             TokenDTO authToken = jwt.validateToken(token);
             if(authToken.getId() == 0L) {
@@ -33,8 +34,29 @@ public class BankController {
             if (!authToken.getIsStudent()) {
                 return ResponseEntity.ok(new ApiResponseDTO<>(false, "학생만 이용 가능한 서비스"));
             }
-            List<AccountDTO> result = accountService.getAccount(authToken.getId());
+            List<AccountService.AccountInfo> result = accountService.getAccount(authToken.getId());
             return ResponseEntity.ok(new ApiResponseDTO<>(true, "통장 조회 완료", result));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "통장 조회 실패"));
+        }
+    }
+    //통장 상세정보 조회
+    @GetMapping("/{accountId}")
+    public ResponseEntity<ApiResponseDTO<AccountService.AccountInfo>> getAccountDetail(@RequestHeader(value = "Authorization") String token, @PathVariable Long accountId){
+        try {
+            TokenDTO authToken = jwt.validateToken(token);
+            if(authToken.getId() == 0L) {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false, "로그인 후 이용 가능"));
+            }
+            if (!authToken.getIsStudent()) {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false, "학생만 이용 가능한 서비스"));
+            }
+            AccountService.AccountInfo result = accountService.getAccountDetail(accountId);
+            if(result != null){
+                return ResponseEntity.ok(new ApiResponseDTO<>(true, "통장 조회 완료", result));
+            }else {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false, "통장 조회 실패"));
+            }
         } catch (Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "통장 조회 실패"));
         }
