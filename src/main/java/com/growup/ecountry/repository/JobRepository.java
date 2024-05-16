@@ -1,14 +1,9 @@
 package com.growup.ecountry.repository;
 
-import com.growup.ecountry.entity.JobDetails;
 import com.growup.ecountry.entity.Jobs;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public interface JobRepository extends JpaRepository<Jobs, Long> {
