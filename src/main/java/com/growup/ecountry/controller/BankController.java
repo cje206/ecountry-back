@@ -69,40 +69,39 @@ public class BankController {
         }
     }
     //월급명세서
-//    @GetMapping("/paystub/")
-//    public ResponseEntity<ApiResponseDTO<NullType>> getPaystub(@RequestHeader(value = "Authorization") String token) {
-//        try {
-//            TokenDTO authToken = jwt.validateToken(token);
-//            if(authToken.getId() != 0) {
-//                bankService.getPaystub(authToken.getId());
-//            }
-//            else {
-//                return ResponseEntity.ok(new ApiResponseDTO<>(false, "사용자 인증 실패", null));
-//            }
-//            return ResponseEntity.ok(new ApiResponseDTO<>(true, "월급명세서"));
-//        }
-//        catch (Exception e) {
-//            return ResponseEntity.ok(new ApiResponseDTO<>(false, "월급명세서 조회 실패", null));
-//        }
-//    }
+    @GetMapping("/paystub")
+    public ResponseEntity<ApiResponseDTO<List<BankService.PaystubDTO>>> getPaystub(@RequestHeader(value = "Authorization") String token) {
+        try {
+            TokenDTO authToken = jwt.validateToken(token);
+            if(authToken.getId() != 0) {
+                 return ResponseEntity.ok(bankService.getPaystub(authToken.getId()));
+            }
+            else {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false, "사용자 인증 실패", null));
+            }
+        }
+        catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "월급명세서 조회 실패", null));
+        }
+    }
     //월급금액확인
     @GetMapping("/salary/{countryId}/{studentId}")
     public ResponseEntity<ApiResponseDTO<Salary>> getSalary(@PathVariable Long countryId, @PathVariable Long studentId) {
         try {
-            ApiResponseDTO<Integer> apiData = bankService.checkSalary(countryId, studentId);
+            ApiResponseDTO<Integer> apiData = bankService.getSalary(countryId, studentId);
             return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), new Salary(apiData.getResult())));
         } catch(Exception e) {
-            return ResponseEntity.ok(new ApiResponseDTO<>(false, "월급 금액 확인 실패", null));
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, e.getMessage(), null));
         }
     }
-    static class Paystub {
-        private final String title;
-        private final Integer value;
-        public Paystub(String title, Integer value) {
-            this.title = title;
-            this.value = value;
-        }
-    }
+//    static class Paystub {
+//        private final String title;
+//        private final Integer value;
+//        public PaystubDTO(String title, Integer value) {
+//            this.title = title;
+//            this.value = value;
+//        }
+//    }
 
     static class Salary {
         private final Integer value;

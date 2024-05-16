@@ -145,11 +145,11 @@ public class UserService {
     }
     //국가리스트 조회
     public ApiResponseDTO<List<CountryDTO>> findCountryList(Long id){
-            Optional<Users> userExist =  userRepository.findById(id);
+            Optional<Users> userExist = userRepository.findById(id);
             List<CountryDTO> userCountryDTOList = new ArrayList<>();
             if(userExist.isPresent()){
                 Users user = userExist.get();
-                List<Countries> countries = countryRepository.findAllByUsers_Id(user.getId());
+                List<Countries> countries = countryRepository.findAllByUserId(user.getId());
                 for(Countries country : countries){
                     CountryDTO countryDTO =
                             CountryDTO.builder()

@@ -30,8 +30,8 @@ public class CountryService {
     private final TokenProvider jwt;
 
     //국가정보 조회
-    public ApiResponseDTO<CountryDTO> findCountries(Long countryId) {
-        Optional<Countries> countryExist = countryRepository.findById(countryId);
+    public ApiResponseDTO<CountryDTO> findCountries(Long id,Long countryId) {
+        Optional<Countries> countryExist = countryRepository.findByIdANDUserId(countryId,id);
         if (countryExist.isPresent()) {
             Countries country = countryExist.get();
             CountryDTO countryDTO = CountryDTO.builder()
@@ -60,7 +60,7 @@ public class CountryService {
                     .classroom(countryDTO.getClassroom())
                     .unit(countryDTO.getUnit())
                     .salaryDate(countryDTO.getSalaryDate())
-                    .users(users).build();
+                    .userId(users.getId()).build();
             countryRepository.save(countries);
             accountListRepository.save(AccountLists.builder().division(false).name("입출금 통장").interest(0.0).available(true).countryId(countries.getId()).build());
             return  new ApiResponseDTO<>(true,"국가 생성 완료",countries.getId());
