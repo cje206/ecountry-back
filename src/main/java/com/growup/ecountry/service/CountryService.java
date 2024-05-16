@@ -76,6 +76,21 @@ public class CountryService {
         return new ApiResponseDTO<>(true,"국가 삭제 성공",null);
       }
 
+      //국고 조회
+    public CountryDTO findTreasury(Long countryId){
+        Countries country = countryRepository.findById(countryId).orElseThrow();
+        CountryDTO countryDTO = null  ;
+        try {
+            countryDTO = CountryDTO.builder().treasury(country.getTreasury()).build();
+        }
+        catch (Exception e){
+            System.out.println("국고 조회 오류 : "+e.getMessage());
+            return countryDTO;
+        }
+        return countryDTO;
+    }
+
+
       //국고 수정
     public Boolean updateTreasury(Long countryId,Integer treasury){
         Countries country = countryRepository.findById(countryId).orElseThrow();
