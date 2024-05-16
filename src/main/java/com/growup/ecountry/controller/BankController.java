@@ -108,27 +108,24 @@ public class BankController {
     }
     //월급금액확인
     @GetMapping("/salary/{countryId}/{studentId}")
-    public ResponseEntity<ApiResponseDTO<Salary>> getSalary(@PathVariable Long countryId, @PathVariable Long studentId) {
+    public ResponseEntity<ApiResponseDTO<SalaryData>> getSalary(@PathVariable Long countryId, @PathVariable Long studentId) {
         try {
             ApiResponseDTO<Integer> apiData = bankService.getSalary(countryId, studentId);
-            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), new Salary(apiData.getResult())));
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), new SalaryData(apiData.getResult())));
         } catch(Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, e.getMessage(), null));
         }
     }
-//    static class Paystub {
-//        private final String title;
-//        private final Integer value;
-//        public PaystubDTO(String title, Integer value) {
-//            this.title = title;
-//            this.value = value;
-//        }
-//    }
 
-    static class Salary {
+
+    static class SalaryData {
         private final Integer value;
-        public Salary (Integer value) {
+        public SalaryData (Integer value) {
             this.value = value;
+        }
+        //직렬화오류로 추가
+        public Integer getValue(){
+            return this.value;
         }
     }
 }
