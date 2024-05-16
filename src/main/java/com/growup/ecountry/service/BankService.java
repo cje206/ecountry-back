@@ -72,14 +72,12 @@ public class BankService {
                 PaystubDTO paystubDTO = PaystubDTO.builder()
                         .title(tax.getName())
                         .value(Integer.valueOf((int)Math.floor(- tax.getTax())))
-                        .division("-")
                         .build();
                 paystubDTOList.add(paystubDTO);
             }
             PaystubDTO salaryDTO = PaystubDTO.builder()
                     .title("월급")
                     .value(Integer.valueOf((int)Math.floor(salary)))
-                    .division("+")
                     .build();
             paystubDTOList.add(salaryDTO);
             return new ApiResponseDTO<>(true, "무직의 월급명세서", paystubDTOList);
@@ -92,14 +90,12 @@ public class BankService {
             PaystubDTO paystubDTO = PaystubDTO.builder()
                     .title(tax.getName())
                     .value(Integer.valueOf((int)Math.floor(- tax.getTax())))
-                    .division("-")
                     .build();
             paystubDTOList.add(paystubDTO);
         }
         PaystubDTO salaryDTO = PaystubDTO.builder()
                 .title("월급")
                 .value(Integer.valueOf((int)Math.floor(salary)))
-                .division("+")
                 .build();
         paystubDTOList.add(salaryDTO);
         return new ApiResponseDTO<>(true, "월급명세서", paystubDTOList);
@@ -137,13 +133,11 @@ public class BankService {
     @Builder
     public static class PaystubDTO {
         private String title;
-        private String division;
         private Integer value;
         public PaystubDTO() {
         }
-        public PaystubDTO(String title, String division,Integer value) {
+        public PaystubDTO(String title,Integer value) {
             this.title = title;
-            this.division = division;
             this.value = value;
         }
     }
