@@ -33,16 +33,15 @@ public class Jobs {
     @Column(nullable = false)
     private Integer salary;
 
+    @Column(nullable = true)
+    private Integer[] skills;
+
     @ManyToOne
     @JoinColumn(name = "country_id", insertable = false, updatable = false)
     private Countries countries;
 
     @Column(name = "country_id")
     private Long countryId;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "jobs", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<JobDetails> jobDetails = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "jobs")

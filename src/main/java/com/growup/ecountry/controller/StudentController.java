@@ -49,9 +49,15 @@ public class StudentController {
         ApiResponseDTO<List<StudentDTO>> apiData = studentService.studentList(countryId);
         List<StudentDTO> students = apiData.getResult();
         for(StudentDTO student : students) {
-            Jobs studentJob = jobRepository.findById(student.getJobId()).get();
-            StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),studentJob.getName(),student.getJobId());
-            studentDataList.add(studentData);
+            if(student.getJobId() == null) {
+                StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),"무직",student.getJobId());
+                studentDataList.add(studentData);
+            }
+            else {
+                Jobs studentJob = jobRepository.findById(student.getJobId()).get();
+                StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),studentJob.getName(),student.getJobId());
+                studentDataList.add(studentData);
+            }
         }
         return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(),studentDataList));
     }

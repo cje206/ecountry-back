@@ -38,12 +38,15 @@ public class Countries {
     @ColumnDefault("0")
     private Integer treasury;
 
-    @ColumnDefault("25")
+    @Column(nullable = false)
     private Integer salaryDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private Users users;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     @Builder.Default
     @OneToMany(mappedBy = "countries")
@@ -68,4 +71,8 @@ public class Countries {
     @Builder.Default
     @OneToMany(mappedBy = "countries", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<News> news = new ArrayList<>();
+
+    public Countries(Long userId){
+        this.userId = userId;
+    }
 }
