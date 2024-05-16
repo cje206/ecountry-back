@@ -117,10 +117,17 @@ public class UserController {
     }
 
     //국가리스트조회
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<List<CountryDTO>>> findCountryList(@PathVariable Long id){
+    @GetMapping("")
+    public ResponseEntity<ApiResponseDTO<List<CountryDTO>>> findCountryList(@RequestHeader(value = "Authorization") String token) {
         try {
-            return ResponseEntity.ok(userService.findCountryList(id));
+            TokenDTO authToken = jwt.validateToken(token);
+            if (authToken.getId() != 0 && authToken.getIsStudent() == false) {
+                Long id = authToken.getId();
+                return ResponseEntity.ok(userService.findCountryList(id));
+            }
+            else {
+                return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가리스트조회 실패",null));
+            }
         } catch (Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가리스트조회 실패",null));
         }

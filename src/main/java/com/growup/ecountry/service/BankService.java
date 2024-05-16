@@ -61,54 +61,72 @@ public class BankService {
                 .id(account.getId()).name(getStudentName(account.getId())).build()).collect(Collectors.toList());
     }
     //월급명세서
-//    public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {
-//        Students student = studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
-//        Jobs jobs = jobRepository.findById(student.getJobId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다"));
-//        Integer salary = jobs.getSalary(); // 월급
-//        List<Taxes> taxes = taxRepository.findByCountryId(student.getCountryId());
-//        List<PaystubDTO> paystubDTOList = new ArrayList<>();
-//        for(Taxes tax : taxes) {
-//            PaystubDTO paystubDTO = new PaystubDTO();
-//            if(tax.getDivision() == 0) {
-//                salary = Integer.valueOf((int)Math.floor(salary - (salary * tax.getTax() / 100)));
-//            }
-//            else if(tax.getDivision() == 1) {
-//                salary = Integer.valueOf((int)Math.floor(salary - tax.getTax()));
-//            }
-//            else if(tax.getDivision() == 2) {
-//                salary = Integer.valueOf((int)Math.floor(salary - tax.getTax()));
-//            }
-//            else if(tax.getDivision() == 3) {
-//                salary = Integer.valueOf((int)Math.floor(salary - tax.getTax()));
-//            }
-//            PaystubDTO.builder()
-//                    .title(tax.getName())
-//                    .value(tax.getTax())
-//                    .
-//        }
-//        return new ApiResponseDTO<>(true, "월급명세서", 0);
-//    }
-    //월급금액확인
-    public ApiResponseDTO<Integer> checkSalary(Long countryId, Long studentId) {
-        Students student = studentRepository.findByIdANDCountryId(studentId, countryId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+    public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {
+        Students student = studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+        if(student.getJobId() == null) {
+            return new ApiResponseDTO<>(false, "존재하지 않는 직업입니다");
+        }
         Jobs jobs = jobRepository.findById(student.getJobId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다"));
-        return new ApiResponseDTO<>(true, "월급금액 확인", jobs.getSalary());
+        Integer salary = jobs.getSalary();
+        Integer actualSalary = jobs.getSalary(); // 월급
+        List<Taxes> taxes = taxRepository.findByCountryId(student.getCountryId());
+        List<PaystubDTO> paystubDTOList = new ArrayList<>();
+        for(Taxes tax : taxes) {
+            PaystubDTO paystubDTO = PaystubDTO.builder()
+                    .title(tax.getName())
+                    .value(Integer.valueOf((int)Math.floor(tax.getTax())))
+                    .build();
+            if(tax.getDivision() == 0) {
+                actualSalary = Integer.valueOf((int)Math.floor(actualSalary - (actualSalary * tax.getTax() / 100)));
+            }
+            else if(tax.getDivision() == 1) {
+                actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
+            }
+            else if(tax.getDivision() == 2) {
+                actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
+            }
+            else if(tax.getDivision() == 3) {
+                actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
+            }
+            paystubDTOList.add(paystubDTO);
+        }
+        PaystubDTO salaryDTO = PaystubDTO.builder()
+                .title("월급")
+                .value(Integer.valueOf((int)Math.floor(salary)))
+                .build();
+        paystubDTOList.add(salaryDTO);
+        PaystubDTO actualSalaryDTO = PaystubDTO.builder()
+                .title("실수령액")
+                .value(Integer.valueOf((int)Math.floor(actualSalary)))
+                .build();
+        paystubDTOList.add(actualSalaryDTO);
+        return new ApiResponseDTO<>(true, "월급명세서", paystubDTOList);
     }
-//    @Getter
-//    @Setter
-//    @Builder
-//    static class PaystubDTO {
-//        private String title;
-//        private Integer value;
-//        public PaystubDTO() {
-//
-//        }
-//        public PaystubDTO(String title, Integer value) {
-//            this.title = title;
-//            this.value = value;
-//        }
+    //월급금액확인
+    public ApiResponseDTO<Integer> getSalary(Long countryId, Long studentId) {
+        Students student = studentRepository.findByIdANDCountryId(studentId, countryId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+        if(student.getJobId() == null) {
+            return new ApiResponseDTO<>(false, "월급금액 확인", 0);
+        }
+        else {
+            Jobs jobs = jobRepository.findById(student.getJobId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다"));
+            return new ApiResponseDTO<>(true, "월급금액 확인", jobs.getSalary());
+        }
     }
-//}
+    @Getter
+    @Setter
+    @Builder
+    public static class PaystubDTO {
+        private String title;
+        private Integer value;
+        public PaystubDTO() {
+        }
+        public PaystubDTO(String title, Integer value) {
+            this.title = title;
+            this.value = value;
+        }
+    }
+}
 
 
 
