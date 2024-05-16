@@ -1,11 +1,8 @@
 package com.growup.ecountry.controller;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.JobDTO;
-import com.growup.ecountry.dto.JobDetailDTO;
-import com.growup.ecountry.repository.JobRepository;
 import com.growup.ecountry.service.JobService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +43,6 @@ public class JobController {
 
     }
 
-    //직업부가기능 1개 삭제
-    @DeleteMapping("/detail/{id}")
-    public ResponseEntity<ApiResponseDTO<NullType>> deleteJobDetail(@PathVariable Long id) {
-        boolean success = jobService.deleteJobDetail(id);
-        String msg = success ? "직업부가기능 1개 삭제에 성공하였습니다." : "직업부가기능 1개 삭제에 실패하였습니다.";
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
-    }
-
     //직업리스트 1개 수정
     @PatchMapping
     public ResponseEntity<ApiResponseDTO<NullType>> updateJob(@RequestBody JobDTO jobDTO){
@@ -61,14 +50,6 @@ public class JobController {
         String msg = success ? "직업리스트 1개 수정에 성공하였습니다." : "직업리스트 1개 수정에 실패하였습니다.";
         return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
-    //직업부가기능 1개 수정
-    @PatchMapping("/detail")
-    public ResponseEntity<ApiResponseDTO<NullType>> updateJobDetail(@RequestBody JobDetailDTO jobDetailDTO){
-        boolean success = jobService.updateJobDetail(jobDetailDTO);
-        String msg = success ? "직업부가기능 1개 수정에 성공하였습니다." : "직업부가기능 1개 수정에 실패하였습니다.";
-        return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
-    }
-
 
 
     @Getter

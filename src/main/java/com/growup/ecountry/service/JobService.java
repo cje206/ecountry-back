@@ -3,48 +3,30 @@ package com.growup.ecountry.service;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.growup.ecountry.controller.JobController;
 import com.growup.ecountry.dto.JobDTO;
-import com.growup.ecountry.dto.JobDetailDTO;
-import com.growup.ecountry.entity.JobDetails;
 import com.growup.ecountry.entity.Jobs;
-import com.growup.ecountry.repository.JobDetailRepository;
 import com.growup.ecountry.repository.JobRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class JobService {
     private final JobRepository jobRepository;
-    private final JobDetailRepository jobDetailRepository;
-
 
     //직업리스트 등록
     public Boolean addJob(List<JobController.JobRequestData> jobRequestDataList){
         try{
            for(JobController.JobRequestData jobRequestData:jobRequestDataList){
                Jobs job = Jobs.builder().name(jobRequestData.getName()).roll(jobRequestData.getRoll()).standard(jobRequestData.getStandard())
-                       .salary(jobRequestData.getSalary()).limited(jobRequestData.getLimited()).countryId(jobRequestData.getCountryId())
+                       .salary(jobRequestData.getSalary()).limited(jobRequestData.getLimited()).countryId(jobRequestData.getCountryId()).skills(jobRequestData.getSkills())
                        .build();
                Jobs newJob = jobRepository.save(job);
-
-               for(int i = 0; i< jobRequestData.getSkills().length ; i ++){
-                    JobDetails jobDetails = JobDetails.builder()
-                            .jobId(newJob.getId())
-                            .skill(jobRequestData.getSkills()[i])
-                            .build();
-                    jobDetailRepository.save(jobDetails);
-               }
            }
-
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("직업리스트 등록 오류 : " + e.getMessage());
             return false;
         }
         return true;
@@ -59,13 +41,12 @@ public class JobService {
 
             jobs.forEach(job ->
                     {
-                        JobResponseData jobData = new JobResponseData(job.getId(), job.getName(), job.getRoll(), job.getStandard(), job.getSalary(), job.getLimited());
-                        jobDetailRepository.findByJobId(job.getId()).forEach(jobDetail -> jobData.setJobSkills(jobDetail.getId(), jobDetail.getSkill()));
+                        JobResponseData jobData = new JobResponseData(job.getId(), job.getName(), job.getRoll(), job.getStandard(), job.getSalary(), job.getLimited(),job.getSkills());
                         jobResponseDataList.add(jobData);
                     }
             );
         } catch (Exception e){
-            System.out.println("error : " + e.getMessage());
+            System.out.println("직업리스트 조회 오류 :  " + e.getMessage());
         }
 
         return jobResponseDataList;
@@ -82,16 +63,6 @@ public class JobService {
         }
         return true;
     }
-    //직업 부가기능 1개 삭제
-    public Boolean deleteJobDetail(Long id){
-        try{
-            jobDetailRepository.deleteById(id);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return false;
-        }
-        return true;
-    }
 
     //직업리스트 수정
     public Boolean updateJob(JobDTO jobDTO){
@@ -102,19 +73,8 @@ public class JobService {
                 job.setStandard(jobDTO.getStandard());
                 job.setSalary(jobDTO.getSalary());
                 job.setLimited(jobDTO.getLimited());
+                job.setSkills(jobDTO.getSkills());
                 jobRepository.save(job);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return false;
-        }
-        return true;
-    }
-    //직업부가기능 수정
-    public Boolean updateJobDetail(JobDetailDTO jobDetailDTO){
-        try{
-            JobDetails jobDetail = jobDetailRepository.findById(jobDetailDTO.getId()).orElseThrow();
-            jobDetail.setSkill(jobDetailDTO.getSkill());
-            jobDetailRepository.save(jobDetail);
         }catch (Exception e){
             System.out.println(e.getMessage());
             return false;
@@ -136,32 +96,16 @@ public class JobService {
         @JsonProperty
         private Integer limited;
         @JsonProperty
-        private List<JobSkill> jobSkills = new ArrayList<>();
+        private Integer[] skills;
 
-        public JobResponseData(Long id, String name, String roll, String standard, Integer salary, Integer limited) {
+        public JobResponseData(Long id, String name, String roll, String standard, Integer salary, Integer limited, Integer[] skills) {
             this.id = id;
             this.name = name;
             this.roll = roll;
             this.standard = standard;
             this.salary = salary;
             this.limited = limited;
-        }
-        public void setJobSkills(Long id, Integer skill){
-            this.jobSkills.add(new JobSkill(id, skill));
-        }
-
-
-    }
-    public static class JobSkill{
-        @JsonProperty
-        private Long skillId;
-        @JsonProperty
-        private Integer skill;
-
-        public JobSkill(Long id, Integer skill) {
-            this.skillId = id;
-            this.skill = skill;
+            this.skills = skills;
         }
     }
-
 }
