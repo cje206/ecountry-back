@@ -16,4 +16,6 @@ public class CountryDTO {
     private String unit;
     private Integer treasury;
     private Integer salaryDate;
+    private String eduOfficeCode;
+    private String schoolCode;
 }
