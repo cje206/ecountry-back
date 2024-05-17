@@ -18,4 +18,5 @@ public interface StudentRepository extends JpaRepository<Students, Long> {
     Optional<Students> findByNameANDPw(@Param("name")String name,@Param("pw")String pw);
     @Query("select s from Students s where s.id = :id and s.countries.id = :countryId")
     Optional<Students> findByIdANDCountryId(@Param("id") Long id, @Param("countryId") Long countryId);
+    Optional<Students> findByCountryId(Long countryId);
 }
