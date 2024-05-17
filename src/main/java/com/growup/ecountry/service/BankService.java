@@ -68,18 +68,27 @@ public class BankService {
             Integer salary = 0; // 월급
             List<Taxes> taxes = taxRepository.findByCountryId(student.getCountryId());
             List<PaystubDTO> paystubDTOList = new ArrayList<>();
-            for(Taxes tax : taxes) {
-                PaystubDTO paystubDTO = PaystubDTO.builder()
-                        .title(tax.getName())
-                        .value(Integer.valueOf((int)Math.floor(- tax.getTax())))
-                        .build();
-                paystubDTOList.add(paystubDTO);
-            }
             PaystubDTO salaryDTO = PaystubDTO.builder()
                     .title("월급")
                     .value(Integer.valueOf((int)Math.floor(salary)))
                     .build();
             paystubDTOList.add(salaryDTO);
+            for(Taxes tax : taxes) {
+                if(tax.getDivision() == 0) {
+                    PaystubDTO paystubDTO = PaystubDTO.builder()
+                            .title(tax.getName())
+                            .value(Integer.valueOf((int)Math.round(-(salary * tax.getTax() / 100)))) // % 비율
+                            .build();
+                    paystubDTOList.add(paystubDTO);
+                }
+                else {
+                    PaystubDTO paystubDTO = PaystubDTO.builder()
+                            .title(tax.getName())
+                            .value(Integer.valueOf((int)Math.floor(-(tax.getTax())))) // 그외 나머지 고정금액
+                            .build();
+                    paystubDTOList.add(paystubDTO);
+                }
+            }
             return new ApiResponseDTO<>(true, "무직의 월급명세서", paystubDTOList);
         }
         // + - 다 더해서 원금 뜰수있게
@@ -87,6 +96,11 @@ public class BankService {
         Integer salary = jobs.getSalary(); //월급
         List<Taxes> taxes = taxRepository.findByCountryId(student.getCountryId());
         List<PaystubDTO> paystubDTOList = new ArrayList<>();
+        PaystubDTO salaryDTO = PaystubDTO.builder()
+                .title("월급")
+                .value(Integer.valueOf((int)Math.floor(salary)))
+                .build();
+        paystubDTOList.add(salaryDTO);
         for(Taxes tax : taxes) {
             if(tax.getDivision() == 0) {
                 PaystubDTO paystubDTO = PaystubDTO.builder()
@@ -104,19 +118,24 @@ public class BankService {
             }
 
         }
-        PaystubDTO salaryDTO = PaystubDTO.builder()
-                .title("월급")
-                .value(Integer.valueOf((int)Math.floor(salary)))
-                .build();
-        paystubDTOList.add(salaryDTO);
         return new ApiResponseDTO<>(true, "월급명세서", paystubDTOList);
     }
     //월급금액확인:실수령액
-    public ApiResponseDTO<Integer> getSalary(Long countryId, Long studentId) {
-        Students student = studentRepository.findByIdANDCountryId(studentId, countryId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+    public ApiResponseDTO<Integer> getSalary(Long id) {
+        Students student = studentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
         //무직월급
         if(student.getJobId() == null) {
-            return new ApiResponseDTO<>(true, "월급금액 확인", 0);
+            Integer actualSalary = 0;
+            List<Taxes> taxes = taxRepository.findByCountryId(student.getCountryId());
+            for(Taxes tax : taxes) {
+                if(tax.getDivision() == 0) {
+                    actualSalary = Integer.valueOf((int)Math.round(actualSalary - (actualSalary * tax.getTax() / 100)));
+                }
+                else {
+                    actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
+                }
+            }
+            return new ApiResponseDTO<>(true, "월급금액 확인", actualSalary);
         }
         else {
             Jobs jobs = jobRepository.findById(student.getJobId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다"));
@@ -126,13 +145,7 @@ public class BankService {
                 if(tax.getDivision() == 0) {
                     actualSalary = Integer.valueOf((int)Math.round(actualSalary - (actualSalary * tax.getTax() / 100)));
                 }
-                else if(tax.getDivision() == 1) {
-                    actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
-                }
-                else if(tax.getDivision() == 2) {
-                    actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
-                }
-                else if(tax.getDivision() == 3) {
+                else {
                     actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
                 }
             }
@@ -145,8 +158,6 @@ public class BankService {
     public static class PaystubDTO {
         private String title;
         private Integer value;
-        public PaystubDTO() {
-        }
         public PaystubDTO(String title,Integer value) {
             this.title = title;
             this.value = value;
