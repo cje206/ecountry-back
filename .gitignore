@@ -38,3 +38,6 @@ out/
 
 *.env
 .DS_Store
+application.properties
+application-local.properties
+application-prod.properties
