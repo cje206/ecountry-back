@@ -150,15 +150,28 @@ public class StudentService {
             Students student = studentRepository.findByIdANDCountryId(studentDTO.getId(),countryId).orElseThrow(()->{
                 throw new IllegalArgumentException("학생 정보 혹은 국가 아이디가 존재하지 않습니다");
             });
-            student = Students.builder()
-                    .id(studentDTO.getId())
-                    .name(studentDTO.getName())
-                    .rollNumber(studentDTO.getRollNumber())
-                    .pw(studentDTO.getPw())
-                    .rating(studentDTO.getRating())
-                    .jobId(studentDTO.getJobId())
-                    .countryId(student.getCountryId()).build();
-            studentRepository.save(student);
+            if(studentDTO.getPw() != null){
+                student = Students.builder()
+                        .id(studentDTO.getId())
+                        .name(studentDTO.getName())
+                        .rollNumber(studentDTO.getRollNumber())
+                        .pw(studentDTO.getPw())
+                        .rating(studentDTO.getRating())
+                        .jobId(studentDTO.getJobId())
+                        .countryId(student.getCountryId()).build();
+                studentRepository.save(student);
+            }
+            else {
+                student = Students.builder()
+                        .id(studentDTO.getId())
+                        .name(studentDTO.getName())
+                        .rollNumber(studentDTO.getRollNumber())
+                        .pw(student.getPw())
+                        .rating(studentDTO.getRating())
+                        .jobId(studentDTO.getJobId())
+                        .countryId(student.getCountryId()).build();
+                studentRepository.save(student);
+            }
         }
         return new ApiResponseDTO<>(true,"국민수정 성공",null);
     }
