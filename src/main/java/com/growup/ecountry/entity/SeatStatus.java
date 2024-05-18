@@ -3,6 +3,8 @@ package com.growup.ecountry.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -22,18 +24,25 @@ public class SeatStatus {
     private Integer colNum;
 
     //자리 실 소유주
-    @Column(nullable = false)
     private Long ownerId;
 
     @ManyToOne
     @JoinColumn(name = "student_id", insertable=false, updatable=false)
-    private Countries countries;
+    private Students students;
 
     //현재 사용자
     @Column(name = "student_id")
     private Long studentId;
 
-    public SeatStatus(Long studentId) {
+    @ManyToOne
+    @JoinColumn(name = "country_id", insertable=false, updatable=false)
+    private Countries countries;
+
+    @Column(name = "country_id")
+    private Long countryId;
+
+    public SeatStatus(Long studentId,Long countryId) {
         this.studentId = studentId;
+        this.countryId = countryId;
     }
 }

@@ -1,8 +1,14 @@
 package com.growup.ecountry.repository;
 
+import com.growup.ecountry.entity.SeatStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface SeatStatusRepository {
+import java.util.List;
+import java.util.Optional;
 
+@Repository
+public interface SeatStatusRepository extends JpaRepository<SeatStatus, Long> {
+    Optional<SeatStatus> findByCountryId(Long countryId);
+    List<SeatStatus> findAllByCountryId(Long countryId);
 }
