@@ -61,14 +61,14 @@ public class SeatStatusService {
     //자리 사용 현황 업데이트
     public ApiResponseDTO<NullType> updateSeatStatus(List<SeatStatusDTO> seatStatusDTOs) {
         for(SeatStatusDTO seatStatusDTO : seatStatusDTOs) {
-            SeatStatus seatStatusExist = seatStatusRepository.findById(seatStatusDTO.getId()).orElseThrow(() -> new IllegalArgumentException("자리 사용 현황가 없는 지원가 있습니다."));
+            SeatStatus seatStatusExist = seatStatusRepository.findById(seatStatusDTO.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석입니다"));
             SeatStatus seatStatus = SeatStatus.builder()
                     .id(seatStatusExist.getId())
                     .rowNum(seatStatusDTO.getRowNum())
                     .colNum(seatStatusDTO.getColNum())
                     .ownerId(null)
                     .studentId(null)
-                    .countryId(seatStatusDTO.getCountryId()).build();
+                    .countryId(seatStatusExist.getCountryId()).build();
 
             if(seatStatusDTO.getOwnerId() != null) {
                 Students ownerStudent = studentRepository.findById(seatStatusDTO.getOwnerId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 학생입니다."));
