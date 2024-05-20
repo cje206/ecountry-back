@@ -73,7 +73,7 @@ public class StudentController {
     }
     //학생로그인
     @PostMapping("/user/{countryId}")
-    public ResponseEntity<ApiResponseDTO<StudentData2>> studentLogin(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
+    public ResponseEntity<ApiResponseDTO<StudentData2>> studentLogin(@PathVariable("countryId") Long countryId,@RequestBody StudentDTO studentDTO){
         ApiResponseDTO<Long> result = studentService.studentLogin(countryId,studentDTO);
         Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(),true)) : new Token(null);
         return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), new StudentData2(token.getToken())));
