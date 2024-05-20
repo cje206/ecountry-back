@@ -87,7 +87,8 @@ public class UserService {
                             .rollNumber(student.getRollNumber())
                             .rating(student.getRating())
                             .img(student.getImg())
-                            .jobId(null).build();
+                            .jobId(null)
+                            .countryId(student.getCountryId()).build();
                     return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
                 }
                 else {
@@ -97,7 +98,8 @@ public class UserService {
                             .rollNumber(student.getRollNumber())
                             .rating(student.getRating())
                             .img(student.getImg())
-                            .jobId(student.getJobId()).build();
+                            .jobId(student.getJobId())
+                            .countryId(student.getCountryId()).build();
                     return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
                 }
             }
