@@ -38,7 +38,9 @@ public class SchoolService {
             URI uri = UriComponentsBuilder.fromHttpUrl(url)
                     .queryParam("Key",apiKey)
                     .queryParam("Type","JSON")
-                    .queryParam("SCHUL_NM",schoolName).build().toUri();
+                    .queryParam("SCHUL_NM",schoolName)
+                    .queryParam("SCHUL_KND_SC_NM", "초등학교")
+                    .build().toUri();
 
             RestClient restClient = RestClient.create();
 
@@ -50,7 +52,6 @@ public class SchoolService {
             if((JSONObject) object.get("RESULT") != null){
                 result = (JSONObject) object.get("RESULT");
                 System.out.println(result);
-
             } else {
                 schoolInfo = (JSONArray) object.get("schoolInfo");
                 JSONObject head = (JSONObject)schoolInfo.get(0);
@@ -60,7 +61,6 @@ public class SchoolService {
                 for (Object schoolData : schoolDatas) {
                     JSONObject data = (JSONObject) schoolData;
                     SchoolInfo getInfo = SchoolInfo.builder().eduOfficeCode(data.get("ATPT_OFCDC_SC_CODE").toString()).schoolCode(data.get("SD_SCHUL_CODE").toString()).schoolName(data.get("SCHUL_NM").toString()).address(data.get("ORG_RDNMA").toString()).build();
-                    System.out.println(getInfo.toString());
                     schoolInfos.add(getInfo);
                 }
             }
