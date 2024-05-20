@@ -70,6 +70,8 @@ public class CountryService {
                     .grade(countryDTO.getGrade())
                     .classroom(countryDTO.getClassroom())
                     .unit(countryDTO.getUnit())
+                    .eduOfficeCode(countryDTO.getEduOfficeCode())
+                    .schoolCode(countryDTO.getSchoolCode())
                     .salaryDate(countryDTO.getSalaryDate())
                     .userId(users.getId()).build();
             countryRepository.save(countries);
