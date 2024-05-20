@@ -58,7 +58,7 @@ public class SeatStatusService {
             }
             return new ApiResponseDTO<>(true, "자리 사용 현황", seatStatusDTOList);
     }
-    //자리 사용 현황 업데이트
+    //자리 사용 현황 수정
     public ApiResponseDTO<NullType> updateSeatStatus(List<SeatStatusDTO> seatStatusDTOs) {
         for(SeatStatusDTO seatStatusDTO : seatStatusDTOs) {
             SeatStatus seatStatusExist = seatStatusRepository.findById(seatStatusDTO.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석입니다"));
