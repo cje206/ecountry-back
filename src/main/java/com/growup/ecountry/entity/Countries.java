@@ -38,8 +38,14 @@ public class Countries {
     @ColumnDefault("0")
     private Integer treasury;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Integer salaryDate;
+
+    @Column(nullable = false, updatable = false)
+    private String eduOfficeCode;
+
+    @Column(nullable = false, updatable = false)
+    private String schoolCode;
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)

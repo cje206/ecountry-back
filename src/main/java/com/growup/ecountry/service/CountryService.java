@@ -47,6 +47,17 @@ public class CountryService {
             return new ApiResponseDTO<>(false, "국가 리스트가 없습니다.", null);
         }
     }
+    //1개 국가 정보 조회
+    public CountryDTO findCountryInfo(Long countryId){
+        Countries country = countryRepository.findById(countryId).orElseThrow();
+        try {
+            return CountryDTO.builder().id(country.getId()).school(country.getSchool()).grade(country.getGrade()).classroom(country.getClassroom()).eduOfficeCode(country.getEduOfficeCode()).schoolCode(country.getSchoolCode()).build();
+        }
+        catch (Exception e){
+            System.out.println("1개 국가 정보 조회 오류 : "+e.getMessage());
+            return null;
+        }
+    }
     //국가생성
      public ApiResponseDTO<Long> create(CountryDTO countryDTO, Long id){
         Optional<Users> user = userRepository.findById(id);
