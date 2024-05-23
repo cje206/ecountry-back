@@ -81,7 +81,7 @@ public class BankController {
         }
     }
     //입금 가능 리스트
-    @GetMapping("/student/{countryId}")
+    @GetMapping("/students/{countryId}")
     public ResponseEntity<ApiResponseDTO<List<AccountDTO>>> getStudent(@PathVariable Long countryId) {
         try {
             List<AccountDTO> result = bankService.getBankList(countryId);
