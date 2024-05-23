@@ -48,13 +48,14 @@ public class BankService {
                 .withdrawId(result.getWithdrawId()).depositName(getStudentName(result.getDepositId())).build();
     }
 
+    //입출급내역조회
     public List<BankDTO> getBank(Long accountId) {
-        return bankRepository.findByDepositIdOrWithdrawId(accountId, accountId).stream().map(list -> BankDTO.builder()
+        return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list -> BankDTO.builder()
                 .id(list.getId()).transaction(list.getTransaction()).createdAt(list.getCreatedAt())
                 .memo(list.getMemo()).isPenalty(list.getIsPenalty()).depositId(list.getDepositId()).withdrawId(list.getWithdrawId())
                 .depositName(getStudentName(list.getDepositId())).withdrawName(getStudentName(list.getWithdrawId())).build()).collect(Collectors.toList());
     }
-
+    // 입금 가능 리스트
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
         return accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()

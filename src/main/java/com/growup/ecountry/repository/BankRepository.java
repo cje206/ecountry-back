@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface BankRepository extends JpaRepository<Banks, Long> {
-    List<Banks> findByDepositIdOrWithdrawId (Long depositId, Long withdrawId);
+    List<Banks> findByDepositIdOrWithdrawIdOrderByIdDesc (Long depositId, Long withdrawId);
     List<Banks> findByIsPenalty(Long penalty);
 }
