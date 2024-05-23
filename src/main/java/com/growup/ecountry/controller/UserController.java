@@ -59,15 +59,15 @@ public class UserController {
                     return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), userData));
                 } else if (result instanceof StudentDTO) {
                     StudentDTO studentDTO = (StudentDTO) result;
-                    //jobName: 무직, jobId: null
+                    //jobName: 무직, jobId: null, skills: null
                     if(studentDTO.getJobId() == null) {
-                        StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),"무직",studentDTO.getJobId(), studentDTO.getCountryId());
+                        StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),"무직",studentDTO.getJobId(), studentDTO.getCountryId(),null);
                         return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), studentData));
                     }
                     Optional<Jobs> jobExist = jobRepository.findById(studentDTO.getJobId());
                     if (jobExist.isPresent()) {
                         Jobs studentJob = jobExist.get();
-                        StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),studentJob.getName(),studentDTO.getJobId(), studentDTO.getCountryId());
+                        StudentData studentData = new StudentData(studentDTO.getId(), studentDTO.getName(), studentDTO.getRollNumber(), studentDTO.getRating(),studentDTO.getImg(),studentJob.getName(),studentDTO.getJobId(), studentDTO.getCountryId(),studentJob.getSkills());
                         return ResponseEntity.ok(new ApiResponseDTO<>(true, apiData.getMessage(), studentData));
                     }
                 }
@@ -184,7 +184,9 @@ public class UserController {
         private final Long jobId;
         @JsonProperty
         private final Long countryId;
-        public StudentData(Long id, String name, Integer rollNumber, Integer rating, String img,String job, Long jobId, Long countryId) {
+        @JsonProperty
+        private final Integer[] skills;
+        public StudentData(Long id, String name, Integer rollNumber, Integer rating, String img,String job, Long jobId, Long countryId, Integer[] skills) {
             this.id = id;
             this.name = name;
             this.rollNumber = rollNumber;
@@ -193,6 +195,7 @@ public class UserController {
             this.job = job;
             this.jobId = jobId;
             this.countryId = countryId;
+            this.skills = skills;
         }
     }
 }
