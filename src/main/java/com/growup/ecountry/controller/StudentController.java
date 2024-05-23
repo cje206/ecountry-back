@@ -33,7 +33,7 @@ public class StudentController {
 
     //국민등록(수기)
     @PostMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<NullType>> studentAdd(@PathVariable Long countryId, @RequestBody List<StudentDTO> studentDTOS){
+    public ResponseEntity<ApiResponseDTO<NullType>> studentAdd(@PathVariable("countryId") Long countryId, @RequestBody List<StudentDTO> studentDTOS){
         return ResponseEntity.ok(studentService.studentAdd(countryId,studentDTOS));
     }
     //국민등록(엑셀)
@@ -44,7 +44,7 @@ public class StudentController {
 
     //국민조회
     @GetMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<List<StudentData>>> studentList(@PathVariable Long countryId){
+    public ResponseEntity<ApiResponseDTO<List<StudentData>>> studentList(@PathVariable("countryId") Long countryId){
         List<StudentData> studentDataList = new ArrayList<>();
         ApiResponseDTO<List<StudentDTO>> apiData = studentService.studentList(countryId);
         List<StudentDTO> students = apiData.getResult();
