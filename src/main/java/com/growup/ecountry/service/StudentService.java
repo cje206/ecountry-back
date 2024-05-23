@@ -179,7 +179,7 @@ public class StudentService {
     public ApiResponseDTO<Long> studentLogin(Long countryId,StudentDTO studentDTO){
             Optional<Countries> countryExist = countryRepository.findById(countryId);
             if(countryExist.isPresent()){
-                Optional<Students> studentExist = studentRepository.findByNameANDPw(studentDTO.getName(),studentDTO.getPw());
+                Optional<Students> studentExist = studentRepository.findByNameANDPwANDRollNumber(studentDTO.getName(),studentDTO.getPw(),studentDTO.getRollNumber());
                 if(studentExist.isPresent()){
                     Students students = studentExist.get();
                     return new ApiResponseDTO<>(true,"학생 로그인 성공",students.getId());
@@ -214,6 +214,7 @@ public class StudentService {
     //학생이미지 수정
     public ApiResponseDTO<NullType> studentImgUpdate(Long countryId,StudentDTO studentDTO){
         String API_URL = "https://api.kakaobrain.com/v2/inference/karlo/t2i";
+
         Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentDTO.getId(),countryId);
         if(studentExist.isPresent()){
             Students student = studentExist.get();
