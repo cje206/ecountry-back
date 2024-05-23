@@ -27,7 +27,7 @@ public class Invests {
     private String info;
 
     @Builder.Default
-    @OneToMany(mappedBy = "invests")
+    @OneToMany(mappedBy = "invests", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvestStatus> investStatus = new ArrayList<>();
 
     @ManyToOne

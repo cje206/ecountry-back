@@ -50,12 +50,12 @@ public class StudentController {
         List<StudentDTO> students = apiData.getResult();
         for(StudentDTO student : students) {
             if(student.getJobId() == null) {
-                StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),"무직",student.getJobId());
+                StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),"무직",student.getJobId(),null);
                 studentDataList.add(studentData);
             }
             else {
                 Jobs studentJob = jobRepository.findById(student.getJobId()).get();
-                StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),studentJob.getName(),student.getJobId());
+                StudentData studentData = new StudentData(student.getId(), student.getName(), student.getRollNumber(), student.getRating(),studentJob.getName(),student.getJobId(),studentJob.getSkills());
                 studentDataList.add(studentData);
             }
         }
@@ -73,7 +73,7 @@ public class StudentController {
     }
     //학생로그인
     @PostMapping("/user/{countryId}")
-    public ResponseEntity<ApiResponseDTO<StudentData2>> studentLogin(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
+    public ResponseEntity<ApiResponseDTO<StudentData2>> studentLogin(@PathVariable("countryId") Long countryId,@RequestBody StudentDTO studentDTO){
         ApiResponseDTO<Long> result = studentService.studentLogin(countryId,studentDTO);
         Token token = result.getSuccess() ? new Token(jwt.generateToken(result.getResult(),true)) : new Token(null);
         return ResponseEntity.ok(new ApiResponseDTO<>(result.getSuccess(), result.getMessage(), new StudentData2(token.getToken())));
@@ -143,13 +143,16 @@ public class StudentController {
         private final String job;
         @JsonProperty
         private final Long jobId;
-        public StudentData(Long id, String name, Integer rollNumber, Integer rating, String job, Long jobId) {
+        @JsonProperty
+        private final Integer[] skills;
+        public StudentData(Long id, String name, Integer rollNumber, Integer rating, String job, Long jobId, Integer[] skills) {
             this.id = id;
             this.name = name;
             this.rollNumber = rollNumber;
             this.rating = rating;
             this.job = job;
             this.jobId = jobId;
+            this.skills = skills;
         }
     }
     static class StudentData2 {
@@ -175,7 +178,6 @@ public class StudentController {
             this.createAt = createAt;
         }
     }
-
     //토큰 발급
     static class Token{
         @JsonProperty
