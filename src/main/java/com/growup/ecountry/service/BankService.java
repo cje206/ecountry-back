@@ -31,6 +31,12 @@ public class BankService {
         return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
     }
 
+    public Integer getStudentRollNumber(Long accountId) {
+        Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
+        return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getRollNumber();
+    }
+
+
     public BankDTO createBank(BankDTO bankDTO) {
         System.out.println(getStudentName(bankDTO.getDepositId()));
 
@@ -59,7 +65,7 @@ public class BankService {
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
         return accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
-                .id(account.getId()).name(getStudentName(account.getId())).build()).collect(Collectors.toList());
+                .id(account.getId()).name(getStudentName(account.getId())).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
     }
     //월급명세서
     public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {
