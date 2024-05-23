@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PetitionRepository extends JpaRepository<Petitions, Long> {
-    List<Petitions> findByCountryId(Long countryId);
+    List<Petitions> findByCountryIdOrderByIdDesc(Long countryId);
 }

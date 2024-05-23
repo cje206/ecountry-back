@@ -80,7 +80,7 @@ public class BankController {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "거래 내역 조회 실패"));
         }
     }
-//    입출금 통장 리스트만 조회
+    //입금 가능 리스트
     @GetMapping("/student/{countryId}")
     public ResponseEntity<ApiResponseDTO<List<AccountDTO>>> getStudent(@PathVariable Long countryId) {
         try {
