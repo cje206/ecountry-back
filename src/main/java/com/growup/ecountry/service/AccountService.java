@@ -121,6 +121,7 @@ public class AccountService {
             AccountLists savingAccountInfo = accountListRepository.findById(accounts.getAccountListId()).orElseThrow();
             if(savingAccountInfo.getDueDate() != null) {
                 savingList.setInterestAndDueDate(savingAccountInfo.getInterest(), savingAccountInfo.getDueDate());
+                savingList.setName(savingAccountInfo.getName());
                 savingLists.add(savingList);
             }
         }
@@ -170,6 +171,7 @@ public class AccountService {
         private Timestamp createdAt;
         private int dueDate;
         private Date expirationDate;
+        private String name;
 
         public SavingList(Long id,int balance,  Timestamp createdAt) {
             this.balance = balance;
