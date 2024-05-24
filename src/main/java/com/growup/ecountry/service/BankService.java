@@ -3,6 +3,7 @@ package com.growup.ecountry.service;
 import com.growup.ecountry.dto.AccountDTO;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.BankDTO;
+import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.*;
 import lombok.Builder;
@@ -158,6 +159,10 @@ public class BankService {
             }
             return new ApiResponseDTO<>(true, "월급금액 확인", actualSalary);
         }
+    }
+    //국가 화폐단위 조회
+    public String getUnit(Long countryId){
+        return countryRepository.findById(countryId).orElseThrow().getUnit();
     }
     @Getter
     @Setter
