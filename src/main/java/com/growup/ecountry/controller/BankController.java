@@ -9,6 +9,7 @@ import com.growup.ecountry.service.AccountService;
 import com.growup.ecountry.service.BankService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -120,6 +121,17 @@ public class BankController {
             }
         } catch(Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, e.getMessage(), null));
+        }
+    }
+    //국가 화폐단위 조회
+    @GetMapping("/unit/{countryId}")
+    public ResponseEntity<ApiResponseDTO<JSONObject>> getUnit(@PathVariable Long countryId) {
+        JSONObject responseData = new JSONObject();
+        try {
+            responseData.put("unit",  bankService.getUnit(countryId));
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, "화폐단위 조회에 성공하였습니다.",responseData));
+        }catch (Exception e){
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "화폐단위 조회에 실패하였습니다."));
         }
     }
 
