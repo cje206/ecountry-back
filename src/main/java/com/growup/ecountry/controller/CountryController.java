@@ -7,6 +7,7 @@ import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.dto.TokenDTO;
 import com.growup.ecountry.service.CountryService;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,19 +23,13 @@ public class CountryController {
 
     //국가정보 조회
     @GetMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<CountryData>> findAllCountries(@RequestHeader(value = "Authorization") String token,@PathVariable Long countryId){
+    public ResponseEntity<ApiResponseDTO<JSONObject>> findAllCountries(@PathVariable Long countryId){
         try {
-            TokenDTO authToken = jwt.validateToken(token);
-            if (authToken.getId() != 0 && authToken.getIsStudent() == false) {
-                ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(authToken.getId(),countryId);
+                ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(countryId);
                 CountryDTO countryDTO = apiData.getResult();
-                return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(),apiData.getMessage(), new CountryData(countryDTO.getName(), countryDTO.getGrade(), countryDTO.getClassroom(), countryDTO.getSalaryDate(), countryDTO.getSchool(), countryDTO.getTreasury())));
-            }
-            else {
-                return ResponseEntity.ok(new ApiResponseDTO<>(false,"국가정보 조회 실패",null));
-            }
+                return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(),apiData.getMessage(), setCountryData(countryDTO)));
         } catch (Exception e) {
-            return ResponseEntity.ok(new ApiResponseDTO<>(false,e.getMessage(),null));
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,e.getMessage()));
         }
     }
 
@@ -73,28 +68,18 @@ public class CountryController {
         return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }
 
-    static class CountryData {
-        @JsonProperty
-        private final String name;
-        @JsonProperty
-        private final Integer grade;
-        @JsonProperty
-        private final Integer classroom;
-        @JsonProperty
-        private final Integer salaryDate;
-        @JsonProperty
-        private final String school;
-        @JsonProperty
-        private final Integer treasury;
-        public CountryData(String name, Integer grade, Integer classroom, Integer salaryDate, String school, Integer treasury) {
-            this.name = name;
-            this.grade = grade;
-            this.classroom = classroom;
-            this.salaryDate = salaryDate;
-            this.school = school;
-            this.treasury = treasury;
-        }
+    public JSONObject setCountryData(CountryDTO countryDTO){
+        JSONObject responseData = new JSONObject();
+        responseData.put("name", countryDTO.getName());
+        responseData.put("grade", countryDTO.getGrade());
+        responseData.put("classroom", countryDTO.getClassroom());
+        responseData.put("unit", countryDTO.getUnit());
+        responseData.put("salaryDate",countryDTO.getSalaryDate());
+        responseData.put("school",countryDTO.getSchool());
+        return responseData;
+
     }
+
     static class CountryData2 {
         @JsonProperty
         private final Long id;
