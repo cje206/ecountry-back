@@ -85,13 +85,13 @@ public class TaxService {
         List<Banks> penaltyList = bankRepository.findByIsPenalty(countryId);
         List<BankDTO> panaltyDTOList = new ArrayList<>();
         try{
-            panaltyDTOList = penaltyList.stream().map(penalty -> BankDTO.builder().id(penalty.getId()).memo(penalty.getMemo()).transaction(penalty.getTransaction()).createdAt(penalty.getCreatedAt()).build()).toList();
+            panaltyDTOList = penaltyList.stream().map(penalty -> BankDTO.builder().id(penalty.getId()).withdrawId(penalty.getWithdrawId()).memo(penalty.getMemo()).transaction(penalty.getTransaction()).createdAt(penalty.getCreatedAt()).build()).toList();
         }catch (Exception e){
             System.out.println("과태료 조회 오류 : " + e.getMessage());
         }
         return panaltyDTOList;
     }
-    //과태료 리스트 조회
+    //부과될 과태료 리스트 조회
     public List<PenaltyList> findPenaltyList(Long countryId){
         try {
             List<Taxes> taxesList = taxRepository.findByCountryIdAndDivision(countryId, 3);
