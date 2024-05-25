@@ -109,16 +109,10 @@ public class BankController {
     }
     //월급금액확인
     @GetMapping("/salary")
-    public ResponseEntity<ApiResponseDTO<SalaryData>> getSalary(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResponseDTO<SalaryData>> getSalary(@RequestParam Long studentId) {
         try {
-            TokenDTO authToken = jwt.validateToken(token);
-            if(authToken.getId() != 0) {
-                ApiResponseDTO<Integer> apiData = bankService.getSalary(authToken.getId());
-                return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), new SalaryData(apiData.getResult())));
-            }
-            else {
-                return ResponseEntity.ok(new ApiResponseDTO<>(false, "사용자 인증 실패", null));
-            }
+            ApiResponseDTO<Integer> apiData = bankService.getSalary(studentId);
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), new SalaryData(apiData.getResult())));
         } catch(Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, e.getMessage(), null));
         }
