@@ -12,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,8 +64,19 @@ public class BankService {
     // 입금 가능 리스트
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
-        return accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
+        List<AccountDTO> accountList =  accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
                 .id(account.getId()).name(getStudentName(account.getId())).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
+        Collections.sort(accountList, new Comparator<AccountDTO>() {
+            @Override
+            public int compare(AccountDTO o1, AccountDTO o2) {
+                //학급번호로 오름차순 정렬
+                if(o1.getRollNumber() >= o2.getRollNumber()){
+                    return 1;
+                }
+                return -1;
+            }
+        });
+        return accountList;
     }
     //월급명세서
     public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {
