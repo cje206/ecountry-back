@@ -108,20 +108,17 @@ public class TaxService {
         try{
             Banks bank = Banks.builder().isPenalty(countryId).transaction(bankDTO.getTransaction()).memo(bankDTO.getMemo()).withdrawId(bankDTO.getWithdrawId()).depositId(null).build();
 
-            //입출금통장 번호 조회
-            List<AccountLists> accountLists = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true);
-            AccountDTO accountDTO = AccountDTO.builder().balance(bankDTO.getTransaction()).accountListId(accountLists.get(0).getId()).build();
             // 입출금통장 조회
-            Accounts studentAccount = accountRepository.findByAccountListId(accountDTO.getAccountListId()).get(0);
+            Accounts studentAccount = accountRepository.findById(bankDTO.getWithdrawId()).orElseThrow();
 
             //bank에 과태료부과내역 추가
             bankRepository.save(bank);
             // 학생 계좌에 금액 업데이트
-            studentAccount.setBalance(studentAccount.getBalance() - accountDTO.getBalance());
+            studentAccount.setBalance(studentAccount.getBalance() - bankDTO.getTransaction());
             accountRepository.save(studentAccount);
             //국고에 금액 업데이트
             Countries country = countryRepository.findById(countryId).orElseThrow();
-            country.setTreasury(country.getTreasury() + accountDTO.getBalance());
+            country.setTreasury(country.getTreasury() + bankDTO.getTransaction());
             countryRepository.save(country);
         }catch (Exception e){
             System.out.println("과태료 부과 오류 : " + e.getMessage());
