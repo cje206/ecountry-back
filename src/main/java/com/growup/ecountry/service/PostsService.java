@@ -27,7 +27,7 @@ public class PostsService {
     //--------------뉴스--------------------------------------------------------
     //뉴스리스트 조회
     public List<NewsDTO> findAllNews(Long countryId){
-        List<News> newsList = newsRepository.findByCountryId(countryId);
+        List<News> newsList = newsRepository.findByCountryIdOrderByIdDesc(countryId);
         List<NewsDTO> newsDTOList = new ArrayList<>();
         try {
             for(News news : newsList){
@@ -126,7 +126,7 @@ public class PostsService {
     //--------------신문고--------------------------------------------------------
     //신문고 리스트 조회
     public List<PetitionDTO> findAllPetitions(Long countryId){
-        List<Petitions> petitionsList = petitionRepository.findByCountryId(countryId);
+        List<Petitions> petitionsList = petitionRepository.findByCountryIdOrderByIdDesc(countryId);
         List<PetitionDTO> petitionDTOList = new ArrayList<>();
         try {
             for(Petitions petitions : petitionsList){

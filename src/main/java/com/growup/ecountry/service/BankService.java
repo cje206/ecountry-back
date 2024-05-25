@@ -3,6 +3,7 @@ package com.growup.ecountry.service;
 import com.growup.ecountry.dto.AccountDTO;
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.dto.BankDTO;
+import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.*;
 import lombok.Builder;
@@ -31,6 +32,12 @@ public class BankService {
         return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
     }
 
+    public Integer getStudentRollNumber(Long accountId) {
+        Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
+        return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getRollNumber();
+    }
+
+
     public BankDTO createBank(BankDTO bankDTO) {
         System.out.println(getStudentName(bankDTO.getDepositId()));
 
@@ -48,17 +55,18 @@ public class BankService {
                 .withdrawId(result.getWithdrawId()).depositName(getStudentName(result.getDepositId())).build();
     }
 
+    //입출급내역조회
     public List<BankDTO> getBank(Long accountId) {
-        return bankRepository.findByDepositIdOrWithdrawId(accountId, accountId).stream().map(list -> BankDTO.builder()
+        return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list -> BankDTO.builder()
                 .id(list.getId()).transaction(list.getTransaction()).createdAt(list.getCreatedAt())
                 .memo(list.getMemo()).isPenalty(list.getIsPenalty()).depositId(list.getDepositId()).withdrawId(list.getWithdrawId())
                 .depositName(getStudentName(list.getDepositId())).withdrawName(getStudentName(list.getWithdrawId())).build()).collect(Collectors.toList());
     }
-
+    // 입금 가능 리스트
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
         return accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
-                .id(account.getId()).name(getStudentName(account.getId())).build()).collect(Collectors.toList());
+                .id(account.getId()).name(getStudentName(account.getId())).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
     }
     //월급명세서
     public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {
@@ -151,6 +159,10 @@ public class BankService {
             }
             return new ApiResponseDTO<>(true, "월급금액 확인", actualSalary);
         }
+    }
+    //국가 화폐단위 조회
+    public String getUnit(Long countryId){
+        return countryRepository.findById(countryId).orElseThrow().getUnit();
     }
     @Getter
     @Setter
