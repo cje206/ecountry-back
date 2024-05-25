@@ -16,4 +16,5 @@ public class AccountDTO {
     private Long studentId;
     private Long accountListId;
     private String name;
+    private Integer rollNumber;
 }

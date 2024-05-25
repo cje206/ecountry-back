@@ -63,9 +63,7 @@ public class AccountController {
     }
     //적금가입
     @PostMapping("/saving")
-    public ResponseEntity<ApiResponseDTO<NullType>> createSaving(@RequestHeader(value = "Authorization") String token,@RequestBody AccountDTO accountDTO){
-        TokenDTO authToken = jwt.validateToken(token);
-        accountDTO.setStudentId(authToken.getId());
+    public ResponseEntity<ApiResponseDTO<NullType>> createSaving(@RequestBody AccountDTO accountDTO){
         boolean success = accountService.createSaving(accountDTO);
         String msg = success ? "적금통장 개설에 성공하였습니다." : "적금통장 개설에 실패하였습니다. ";
         return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
@@ -73,17 +71,15 @@ public class AccountController {
 
     //학생별 가입된 적금리스트 조회
     @GetMapping("/saving")
-    public ResponseEntity<ApiResponseDTO<List<AccountService.SavingList>>> findAllSaving(@RequestHeader(value = "Authorization") String token){
-        TokenDTO authToken = jwt.validateToken(token);
-        List<AccountService.SavingList> savingLists  = accountService.findSavingList(authToken.getId());
+    public ResponseEntity<ApiResponseDTO<List<AccountService.SavingList>>> findAllSaving(@RequestParam Long studentId) {
+        List<AccountService.SavingList> savingLists = accountService.findSavingList(studentId);
         return ResponseEntity.ok(new ApiResponseDTO<List<AccountService.SavingList>>(true, "가입된 적금리스트 정보 조회에 성공하였습니다.", savingLists));
     }
 
     //적금해지
     @DeleteMapping("/saving/{countryId}")
-    public ResponseEntity<ApiResponseDTO<NullType>> closeSaving(@RequestHeader(value = "Authorization") String token, @RequestBody AccountDTO accountDTO, @PathVariable Long countryId){
-        TokenDTO authToken = jwt.validateToken(token);
-        boolean success = accountService.closeSaving(countryId, authToken.getId(), accountDTO);
+    public ResponseEntity<ApiResponseDTO<NullType>> closeSaving(@RequestBody AccountDTO accountDTO, @PathVariable Long countryId){
+        boolean success = accountService.closeSaving(countryId, accountDTO.getStudentId(), accountDTO);
         String msg = success ? "적금통장 해지에 성공하였습니다." : "적금통장 해지에 실패하였습니다. ";
         return ResponseEntity.ok(new ApiResponseDTO<NullType>(success, msg));
     }

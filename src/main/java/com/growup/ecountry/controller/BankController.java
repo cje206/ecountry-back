@@ -9,6 +9,7 @@ import com.growup.ecountry.service.AccountService;
 import com.growup.ecountry.service.BankService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,8 +81,8 @@ public class BankController {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "거래 내역 조회 실패"));
         }
     }
-//    입출금 통장 리스트만 조회
-    @GetMapping("/student/{countryId}")
+    //입금 가능 리스트
+    @GetMapping("/students/{countryId}")
     public ResponseEntity<ApiResponseDTO<List<AccountDTO>>> getStudent(@PathVariable Long countryId) {
         try {
             List<AccountDTO> result = bankService.getBankList(countryId);
@@ -108,18 +109,23 @@ public class BankController {
     }
     //월급금액확인
     @GetMapping("/salary")
-    public ResponseEntity<ApiResponseDTO<SalaryData>> getSalary(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<ApiResponseDTO<SalaryData>> getSalary(@RequestParam Long studentId) {
         try {
-            TokenDTO authToken = jwt.validateToken(token);
-            if(authToken.getId() != 0) {
-                ApiResponseDTO<Integer> apiData = bankService.getSalary(authToken.getId());
-                return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), new SalaryData(apiData.getResult())));
-            }
-            else {
-                return ResponseEntity.ok(new ApiResponseDTO<>(false, "사용자 인증 실패", null));
-            }
+            ApiResponseDTO<Integer> apiData = bankService.getSalary(studentId);
+            return ResponseEntity.ok(new ApiResponseDTO<>(apiData.getSuccess(), apiData.getMessage(), new SalaryData(apiData.getResult())));
         } catch(Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, e.getMessage(), null));
+        }
+    }
+    //국가 화폐단위 조회
+    @GetMapping("/unit/{countryId}")
+    public ResponseEntity<ApiResponseDTO<JSONObject>> getUnit(@PathVariable Long countryId) {
+        JSONObject responseData = new JSONObject();
+        try {
+            responseData.put("unit",  bankService.getUnit(countryId));
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, "화폐단위 조회에 성공하였습니다.",responseData));
+        }catch (Exception e){
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, "화폐단위 조회에 실패하였습니다."));
         }
     }
 

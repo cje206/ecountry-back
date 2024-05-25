@@ -30,8 +30,8 @@ public class CountryService {
     private final TokenProvider jwt;
 
     //국가정보 조회
-    public ApiResponseDTO<CountryDTO> findCountries(Long id,Long countryId) {
-        Optional<Countries> countryExist = countryRepository.findByIdANDUserId(countryId,id);
+    public ApiResponseDTO<CountryDTO> findCountries(Long countryId) {
+        Optional<Countries> countryExist = countryRepository.findById(countryId);
         if (countryExist.isPresent()) {
             Countries country = countryExist.get();
             CountryDTO countryDTO = CountryDTO.builder()
@@ -70,6 +70,8 @@ public class CountryService {
                     .grade(countryDTO.getGrade())
                     .classroom(countryDTO.getClassroom())
                     .unit(countryDTO.getUnit())
+                    .eduOfficeCode(countryDTO.getEduOfficeCode())
+                    .schoolCode(countryDTO.getSchoolCode())
                     .salaryDate(countryDTO.getSalaryDate())
                     .userId(users.getId()).build();
             countryRepository.save(countries);
