@@ -185,7 +185,12 @@ public class StudentService {
                 Optional<Students> studentExist = studentRepository.findByNameANDPwANDRollNumber(studentDTO.getName(),studentDTO.getPw(),studentDTO.getRollNumber());
                 if(studentExist.isPresent()){
                     Students students = studentExist.get();
-                    return new ApiResponseDTO<>(true,"학생 로그인 성공",students.getId());
+                    if(students.getAvailable()){
+                        return new ApiResponseDTO<>(true,"학생 로그인 성공",students.getId());
+                    }
+                    else {
+                        return new ApiResponseDTO<>(false,"비활성화된 계정입니다.",null);
+                    }
                 }
                 else {
                     return new ApiResponseDTO<>(false,"사용자 정보가 일치하지 않습니다",null);
