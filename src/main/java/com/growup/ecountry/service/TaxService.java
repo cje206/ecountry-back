@@ -21,19 +21,29 @@ public class TaxService {
     private final BankRepository bankRepository;
     private final AccountListRepository accountListRepository;
     private final AccountRepository accountRepository;
-    private  final CountryRepository countryRepository;
+    private final CountryRepository countryRepository;
+    private final ChatbotService chatbotService;
 
     //세금리스트 등록
     public Boolean addTaxes(List<TaxDTO> taxDTOList){
         try{
-            List<Taxes> taxesList = taxDTOList.stream().map(taxDTO -> Taxes.builder()
-                    .name(taxDTO.getName())
-                    .division(taxDTO.getDivision())
-                    .tax(taxDTO.getTax())
-                    .countryId(taxDTO.getCountryId())
-                    .build()).collect(Collectors.toList())
-                    ;
+            List<Taxes> taxesList = taxDTOList.stream().map(taxDTO -> {
+                if (taxDTO.getDivision() == 3) {
+                    chatbotService.insertChatbot(taxDTO.getName(), "과태료");
+
+                } else if (taxDTO.getDivision() != 2) {
+                    chatbotService.insertChatbot(taxDTO.getName(), "세법");
+                }
+                return Taxes.builder()
+                        .name(taxDTO.getName())
+                        .division(taxDTO.getDivision())
+                        .tax(taxDTO.getTax())
+                        .countryId(taxDTO.getCountryId())
+                        .build();
+
+            } ).collect(Collectors.toList());
             taxRepository.saveAll(taxesList);
+
         }catch (Exception e){
             System.out.println("세금리스트 등록 오류 : " + e.getMessage());
             System.out.println(e.getMessage());
