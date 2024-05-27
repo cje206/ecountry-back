@@ -36,6 +36,9 @@ public class Jobs {
     @Column(nullable = true)
     private Integer[] skills;
 
+    @Column
+    private String jobImg;
+
     @ManyToOne
     @JoinColumn(name = "country_id", insertable = false, updatable = false)
     private Countries countries;

@@ -179,7 +179,7 @@ public class StudentService {
     public ApiResponseDTO<Long> studentLogin(Long countryId,StudentDTO studentDTO){
             Optional<Countries> countryExist = countryRepository.findById(countryId);
             if(countryExist.isPresent()){
-                Optional<Students> studentExist = studentRepository.findByNameANDPw(studentDTO.getName(),studentDTO.getPw());
+                Optional<Students> studentExist = studentRepository.findByNameANDPwANDRollNumber(studentDTO.getName(),studentDTO.getPw(),studentDTO.getRollNumber());
                 if(studentExist.isPresent()){
                     Students students = studentExist.get();
                     return new ApiResponseDTO<>(true,"학생 로그인 성공",students.getId());
@@ -213,19 +213,21 @@ public class StudentService {
     }
     //학생이미지 수정
     public ApiResponseDTO<NullType> studentImgUpdate(Long countryId,StudentDTO studentDTO){
+        String API_URL = "https://api.kakaobrain.com/v2/inference/karlo/t2i";
+
         Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentDTO.getId(),countryId);
         if(studentExist.isPresent()){
             Students student = studentExist.get();
-            student = Students.builder()
-                    .id(student.getId())
-                    .name(student.getName())
-                    .rollNumber(student.getRollNumber())
-                    .pw(student.getPw())
-                    .rating(student.getRating())
-                    .countryId(student.getCountryId())
-                    .img(studentDTO.getImg()).build();
-            studentRepository.save(student);
-            return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
+                student = Students.builder()
+                        .id(student.getId())
+                        .name(student.getName())
+                        .rollNumber(student.getRollNumber())
+                        .pw(student.getPw())
+                        .rating(student.getRating())
+                        .countryId(student.getCountryId())
+                        .img(studentDTO.getImg()).build();
+                studentRepository.save(student);
+                return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
         }
         else {
             return new ApiResponseDTO<>(false,"국민이 존재하지 않습니다",null);
@@ -284,18 +286,6 @@ public class StudentService {
             return new ApiResponseDTO<>(false,"알림 발송에 실패하였습니다",null);
         }
     }
-//    // Date를 문자열로 형식화하는 함수
-//    private Date formatDate(Date date) {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        String formattedDate = sdf.format(date);
-//        try {
-//            return sdf.parse(formattedDate);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-
     //학생 신용등급 수정
     public boolean updateRating(StudentDTO studentDTO){
         Students student = studentRepository.findById(studentDTO.getId()).orElseThrow();

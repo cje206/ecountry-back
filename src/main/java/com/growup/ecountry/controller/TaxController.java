@@ -82,7 +82,7 @@ public class TaxController {
     @GetMapping("/penalty/{countryId}")
     public ResponseEntity<ApiResponseDTO<List<Penalty>>> findAllPenaltyList(@PathVariable Long countryId){
         try {
-            List<Penalty> penalties = taxService.findPenalty(countryId).stream().map(penalty -> Penalty.builder().id(penalty.getId()).memo(penalty.getMemo()).createdAt(penalty.getCreatedAt()).transaction(penalty.getTransaction()).build()).toList();
+            List<Penalty> penalties = taxService.findPenalty(countryId).stream().map(penalty -> Penalty.builder().id(penalty.getId()).withdrawId(penalty.getWithdrawId()).memo(penalty.getMemo()).createdAt(penalty.getCreatedAt()).transaction(penalty.getTransaction()).build()).toList();
             return ResponseEntity.ok(new ApiResponseDTO<List<Penalty>>(true, "과태료 조회에 성공하였습니다.", penalties));
 
         }catch (Exception e){
@@ -129,12 +129,15 @@ public class TaxController {
         private String memo ;
         @JsonProperty
         private Timestamp createdAt;
+        @JsonProperty
+        private Long withdrawId;
 
-        public Penalty(Long id, Integer transaction, String memo, Timestamp createdAt) {
+        public Penalty(Long id, Integer transaction, String memo, Timestamp createdAt, Long withdrawId) {
             this.id = id;
             this.transaction = transaction;
             this.memo = memo;
             this.createdAt = createdAt;
+            this.withdrawId = withdrawId;
         }
     }
 

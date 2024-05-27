@@ -16,4 +16,5 @@ public class JobDTO {
     private Integer salary;
     private Integer[] skills;
     private Long countryId;
+    private String jobImg;
 }

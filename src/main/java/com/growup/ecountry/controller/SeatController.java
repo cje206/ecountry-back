@@ -46,7 +46,7 @@ public class SeatController {
             seatService.updateSeat(seatDTOS);
             return ResponseEntity.ok(new ApiResponseDTO<>(true, "자리 배치 수정 완료"));
         } catch (Exception e) {
-            return ResponseEntity.ok(new ApiResponseDTO<>(false, "자리 배치 수정 실패"));
+            return ResponseEntity.ok(new ApiResponseDTO<>(false, e.getMessage()));
         }
     }
 }
