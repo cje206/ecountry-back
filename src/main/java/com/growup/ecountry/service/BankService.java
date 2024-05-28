@@ -27,6 +27,9 @@ public class BankService {
     private final JobRepository jobRepository;
 
     public String getStudentName(Long accountId) {
+        if(accountId == 0){
+            return "급여";
+        }
         Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
         return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
     }
@@ -62,6 +65,7 @@ public class BankService {
 
     //입출급내역조회
     public List<BankDTO> getBank(Long accountId) {
+
         return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list -> BankDTO.builder()
                 .id(list.getId()).transaction(list.getTransaction()).createdAt(list.getCreatedAt())
                 .memo(list.getMemo()).isPenalty(list.getIsPenalty()).depositId(list.getDepositId()).withdrawId(list.getWithdrawId())

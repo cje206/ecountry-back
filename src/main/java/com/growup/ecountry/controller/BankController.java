@@ -75,9 +75,11 @@ public class BankController {
     @GetMapping("/list/{accountId}")
     public ResponseEntity<ApiResponseDTO<List<BankDTO>>> getHistory(@PathVariable Long accountId) {
         try {
+            System.out.println("accountId : "+accountId);
             List<BankDTO> result = bankService.getBank(accountId);
             return ResponseEntity.ok(new ApiResponseDTO<>(true, "거래 내역 조회 완료", result));
         } catch (Exception e) {
+            System.out.println("거래내역조회실패 : " + e +  e.getMessage());
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "거래 내역 조회 실패"));
         }
     }
