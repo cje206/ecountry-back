@@ -12,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +27,9 @@ public class BankService {
     private final JobRepository jobRepository;
 
     public String getStudentName(Long accountId) {
+        if(accountId == 0){
+            return "급여";
+        }
         Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
         return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
     }
@@ -44,12 +46,18 @@ public class BankService {
         Banks result = bankRepository.save(Banks.builder().transaction(bankDTO.getTransaction())
                 .memo(bankDTO.getMemo()).depositId(bankDTO.getDepositId())
                 .withdrawId(bankDTO.getWithdrawId()).isPenalty(0L).build());
+
         Accounts deposit = accountRepository.findById(bankDTO.getDepositId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
         deposit.setBalance(deposit.getBalance()+bankDTO.getTransaction());
         accountRepository.save(deposit);
-        Accounts withdraw = accountRepository.findById(bankDTO.getWithdrawId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
-        withdraw.setBalance(withdraw.getBalance()-bankDTO.getTransaction());
-        accountRepository.save(withdraw);
+
+        //월급지급 제외한 경우만 저장
+        if(bankDTO.getWithdrawId() != 0){
+            Accounts withdraw = accountRepository.findById(bankDTO.getWithdrawId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
+            withdraw.setBalance(withdraw.getBalance()-bankDTO.getTransaction());
+            accountRepository.save(withdraw);
+        }
+
         return BankDTO.builder().id(result.getId()).transaction(result.getTransaction())
                 .createdAt(result.getCreatedAt()).memo(result.getMemo()).depositId(result.getDepositId())
                 .withdrawId(result.getWithdrawId()).depositName(getStudentName(result.getDepositId())).build();
@@ -57,6 +65,7 @@ public class BankService {
 
     //입출급내역조회
     public List<BankDTO> getBank(Long accountId) {
+
         return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list -> BankDTO.builder()
                 .id(list.getId()).transaction(list.getTransaction()).createdAt(list.getCreatedAt())
                 .memo(list.getMemo()).isPenalty(list.getIsPenalty()).depositId(list.getDepositId()).withdrawId(list.getWithdrawId())
@@ -65,8 +74,19 @@ public class BankService {
     // 입금 가능 리스트
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
-        return accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
-                .id(account.getId()).name(getStudentName(account.getId())).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
+        List<AccountDTO> accountList =  accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
+                .id(account.getId()).name(getStudentName(account.getId())).studentId(account.getStudentId()).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
+        Collections.sort(accountList, new Comparator<AccountDTO>() {
+            @Override
+            public int compare(AccountDTO o1, AccountDTO o2) {
+                //학급번호로 오름차순 정렬
+                if(o1.getRollNumber() >= o2.getRollNumber()){
+                    return 1;
+                }
+                return -1;
+            }
+        });
+        return accountList;
     }
     //월급명세서
     public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {
