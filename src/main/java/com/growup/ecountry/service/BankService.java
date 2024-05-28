@@ -43,12 +43,18 @@ public class BankService {
         Banks result = bankRepository.save(Banks.builder().transaction(bankDTO.getTransaction())
                 .memo(bankDTO.getMemo()).depositId(bankDTO.getDepositId())
                 .withdrawId(bankDTO.getWithdrawId()).isPenalty(0L).build());
+
         Accounts deposit = accountRepository.findById(bankDTO.getDepositId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
         deposit.setBalance(deposit.getBalance()+bankDTO.getTransaction());
         accountRepository.save(deposit);
-        Accounts withdraw = accountRepository.findById(bankDTO.getWithdrawId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
-        withdraw.setBalance(withdraw.getBalance()-bankDTO.getTransaction());
-        accountRepository.save(withdraw);
+
+        //월급지급 제외한 경우만 저장
+        if(bankDTO.getWithdrawId() != 0){
+            Accounts withdraw = accountRepository.findById(bankDTO.getWithdrawId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
+            withdraw.setBalance(withdraw.getBalance()-bankDTO.getTransaction());
+            accountRepository.save(withdraw);
+        }
+
         return BankDTO.builder().id(result.getId()).transaction(result.getTransaction())
                 .createdAt(result.getCreatedAt()).memo(result.getMemo()).depositId(result.getDepositId())
                 .withdrawId(result.getWithdrawId()).depositName(getStudentName(result.getDepositId())).build();
