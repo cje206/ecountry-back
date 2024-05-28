@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobService {
     private final JobRepository jobRepository;
+    private final ChatbotService chatbotService;
 
     //직업리스트 등록
     public Boolean addJob(List<JobController.JobRequestData> jobRequestDataList){
@@ -24,6 +25,7 @@ public class JobService {
                        .salary(jobRequestData.getSalary()).limited(jobRequestData.getLimited()).countryId(jobRequestData.getCountryId()).skills(jobRequestData.getSkills())
                        .build();
                Jobs newJob = jobRepository.save(job);
+               chatbotService.insertChatbot(job.getName(),"직업");
            }
         }catch (Exception e){
             System.out.println("직업리스트 등록 오류 : " + e.getMessage());
