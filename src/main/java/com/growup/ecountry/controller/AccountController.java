@@ -27,7 +27,6 @@ public class AccountController {
             return ResponseEntity.ok(new ApiResponseDTO<>(true, "적금 통장 추가 완료"));
         } catch (Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "적금 통장 추가 실패"));
-
         }
     }
 
@@ -39,7 +38,6 @@ public class AccountController {
         } catch (Exception e) {
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "개설 가능 적금 통장 조회 실패"));
         }
-
     }
 
     @PatchMapping
