@@ -65,7 +65,7 @@ public class BankService {
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
         List<AccountDTO> accountList =  accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
-                .id(account.getId()).name(getStudentName(account.getId())).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
+                .id(account.getId()).name(getStudentName(account.getId())).studentId(account.getStudentId()).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
         Collections.sort(accountList, new Comparator<AccountDTO>() {
             @Override
             public int compare(AccountDTO o1, AccountDTO o2) {
