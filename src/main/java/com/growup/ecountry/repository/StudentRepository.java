@@ -15,6 +15,9 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Students, Long> {
     @Query("select s from Students s where s.countryId = :countryId order by s.rollNumber")
     List<Students> findAllByCountryId(@Param("countryId")Long countryId);
+
+    List<Students> findAllByCountryIdAndAvailable(Long countryId,Boolean available);
+
     @Query("select s from Students s where s.name = :name and s.pw = :pw and s.rollNumber = :rollNumber")
     Optional<Students> findByNameANDPwANDRollNumber(@Param("name")String name,@Param("pw")String pw, @Param("rollNumber")Integer rollNumber);
     @Query("select s from Students s where s.id = :id and s.countries.id = :countryId")
