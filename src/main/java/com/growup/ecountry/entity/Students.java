@@ -31,6 +31,9 @@ public class Students {
 
     private String img;
 
+    @Column(columnDefinition = "TINYINT(1) default 1")
+    private Boolean available;
+
     @ManyToOne
     @JoinColumn(name = "country_id",insertable=false, updatable=false)
     private Countries countries;

@@ -23,7 +23,7 @@ public class CountryController {
 
     //국가정보 조회
     @GetMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<JSONObject>> findAllCountries(@PathVariable Long countryId){
+    public ResponseEntity<ApiResponseDTO<JSONObject>> findAllCountries(@PathVariable("countryId") Long countryId){
         try {
                 ApiResponseDTO<CountryDTO> apiData = countryService.findCountries(countryId);
                 CountryDTO countryDTO = apiData.getResult();

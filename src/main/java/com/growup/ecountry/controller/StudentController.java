@@ -46,7 +46,7 @@ public class StudentController {
     @GetMapping("/{countryId}")
     public ResponseEntity<ApiResponseDTO<List<StudentData>>> studentList(@PathVariable("countryId") Long countryId){
         List<StudentData> studentDataList = new ArrayList<>();
-        ApiResponseDTO<List<StudentDTO>> apiData = studentService.studentList(countryId);
+        ApiResponseDTO<List<StudentDTO>> apiData = studentService.studentList(countryId,true);
         List<StudentDTO> students = apiData.getResult();
         for(StudentDTO student : students) {
             if(student.getJobId() == null) {
@@ -63,12 +63,12 @@ public class StudentController {
     }
     //국민삭제
     @DeleteMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<NullType>> studentDelete(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
+    public ResponseEntity<ApiResponseDTO<NullType>> studentDelete(@PathVariable("countryId") Long countryId,@RequestBody StudentDTO studentDTO){
         return ResponseEntity.ok(studentService.studentDelete(countryId,studentDTO.getId()));
     }
     //국민수정
     @PatchMapping("/{countryId}")
-    public ResponseEntity<ApiResponseDTO<NullType>> studentUpdate(@PathVariable Long countryId,@RequestBody List<StudentDTO> studentDTOs){
+    public ResponseEntity<ApiResponseDTO<NullType>> studentUpdate(@PathVariable("countryId") Long countryId,@RequestBody List<StudentDTO> studentDTOs){
         return ResponseEntity.ok(studentService.studentUpdate(countryId,studentDTOs));
     }
     //학생로그인
