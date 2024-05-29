@@ -2,6 +2,7 @@ package com.growup.ecountry.controller;
 
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.service.ChatbotService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class ChatbotController {
     private final ChatbotService chatbotService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponseDTO<String>> talkWithChatbot(@RequestParam String text){
+    @PostMapping
+    public ResponseEntity<ApiResponseDTO<String>> talkWithChatbot(@RequestBody String text){
         try{
             return ResponseEntity.ok(new ApiResponseDTO<>(true, "대화에 성공하였습니다. ", chatbotService.talkWithChatbot(text)));
         }catch (Exception e){
@@ -21,4 +22,9 @@ public class ChatbotController {
         }
 
     }
+    @GetMapping("/check")
+    public ResponseEntity<ApiResponseDTO<String>> checkChatbot(){
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "hi", chatbotService.checkChatbotConnection()));
+    }
+
 }
