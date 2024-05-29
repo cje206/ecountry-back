@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class ChatbotController {
     private final ChatbotService chatbotService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponseDTO<String>> talkWithChatbot(@RequestParam String text){
+    @PostMapping
+    public ResponseEntity<ApiResponseDTO<String>> talkWithChatbot(@RequestBody String text){
         try{
             return ResponseEntity.ok(new ApiResponseDTO<>(true, "대화에 성공하였습니다. ", chatbotService.talkWithChatbot(text)));
         }catch (Exception e){
