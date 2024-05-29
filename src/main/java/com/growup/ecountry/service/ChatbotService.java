@@ -1,6 +1,7 @@
 package com.growup.ecountry.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.xssf.model.StylesTable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.file.attribute.AclEntryType;
 import java.util.HashMap;
 
 @Service
@@ -74,10 +76,21 @@ public class ChatbotService {
 
         }catch (Exception e){
             System.out.println("챗봇과 대화 오류 : "+ e + "\n" +  e.getMessage());
-            // 에러 내보내줘야하는데 고민해보기..
-            return e.getMessage();
+            return e + "\n" +e.getMessage();
         }
     }
-
-
+    public String checkChatbotConnection(){
+        try{
+            String url = chatbotServer + "/hello";
+            URI uri = UriComponentsBuilder.fromHttpUrl(url).build().toUri();
+            JSONParser parser = new JSONParser();
+            RestClient restClient = RestClient.create();
+            String response = restClient.get().uri(uri).retrieve().body(String.class);
+            System.out.println(response);
+            return response;
+        } catch (Exception e){
+            System.out.println("챗봇 확인 오류 : " + e + "\n" + e.getMessage());
+            return e + "\n" + e.getMessage();
+        }
+    }
 }
