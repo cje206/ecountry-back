@@ -75,7 +75,8 @@ public class BankService {
     //입출급내역조회
     public List<BankDTO> getBank(Long accountId) {
 
-        return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list -> BankDTO.builder()
+        return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list ->
+                BankDTO.builder()
                 .id(list.getId()).transaction(list.getTransaction()).createdAt(list.getCreatedAt())
                 .memo(list.getMemo()).isPenalty(list.getIsPenalty()).depositId(list.getDepositId()).withdrawId(list.getWithdrawId())
                 .depositName(getStudentName(list.getDepositId())).withdrawName(getStudentName(list.getWithdrawId())).build()).collect(Collectors.toList());
@@ -83,9 +84,17 @@ public class BankService {
     // 입금 가능 리스트
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
-        List<AccountDTO> accountList =  accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
-                .id(account.getId()).name(getStudentName(account.getId())).studentId(account.getStudentId()).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
-        Collections.sort(accountList, new Comparator<AccountDTO>() {
+        List<Accounts> accountsList=  accountRepository.findByAccountListId(accountListId);
+        List<AccountDTO> accountDTOList = new ArrayList<>();
+        for(Accounts account :accountsList){
+            boolean isAvailable = studentRepository.findById(account.getStudentId()).orElseThrow().getAvailable();
+            if (isAvailable) {
+                accountDTOList.add(AccountDTO.builder()
+                        .id(account.getId()).name(getStudentName(account.getId())).studentId(account.getStudentId()).rollNumber(getStudentRollNumber(account.getId())).build());
+            }
+        }
+
+        Collections.sort(accountDTOList, new Comparator<AccountDTO>() {
             @Override
             public int compare(AccountDTO o1, AccountDTO o2) {
                 //학급번호로 오름차순 정렬
@@ -95,7 +104,7 @@ public class BankService {
                 return -1;
             }
         });
-        return accountList;
+        return accountDTOList;
     }
     //월급명세서
     public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {
