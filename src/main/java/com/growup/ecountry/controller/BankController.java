@@ -90,6 +90,7 @@ public class BankController {
             List<AccountDTO> result = bankService.getBankList(countryId);
             return ResponseEntity.ok(new ApiResponseDTO<>(true, "입출금 통장 조회 완료", result));
         } catch (Exception e) {
+            System.out.println("입금 가능 리스트 조회실패 : " + e +  e.getMessage());
             return ResponseEntity.ok(new ApiResponseDTO<>(false, "입출금 통장 조회 실패"));
         }
     }
