@@ -6,12 +6,14 @@ import com.growup.ecountry.dto.BankDTO;
 import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.*;
+import jakarta.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
+import javax.lang.model.type.NullType;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,12 +28,19 @@ public class BankService {
     private final TaxRepository taxRepository;
     private final JobRepository jobRepository;
 
-    public String getStudentName(Long accountId) {
-        if(accountId == 0){
-            return "급여";
+    public String getStudentName(@Nullable Long accountId) {
+        try {
+            if(Objects.nonNull(accountId) && accountId == 0){
+                return "급여";
+            }
+            System.out.println("accountId : " + accountId);
+            Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
+            return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
+        }catch (Exception e){
+            System.out.println("이름가져오기 오류 accountId는 " +accountId + e.getMessage() );
+            return null;
         }
-        Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
-        return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
+
     }
 
     public Integer getStudentRollNumber(Long accountId) {
@@ -66,7 +75,8 @@ public class BankService {
     //입출급내역조회
     public List<BankDTO> getBank(Long accountId) {
 
-        return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list -> BankDTO.builder()
+        return bankRepository.findByDepositIdOrWithdrawIdOrderByIdDesc(accountId, accountId).stream().map(list ->
+                BankDTO.builder()
                 .id(list.getId()).transaction(list.getTransaction()).createdAt(list.getCreatedAt())
                 .memo(list.getMemo()).isPenalty(list.getIsPenalty()).depositId(list.getDepositId()).withdrawId(list.getWithdrawId())
                 .depositName(getStudentName(list.getDepositId())).withdrawName(getStudentName(list.getWithdrawId())).build()).collect(Collectors.toList());
@@ -74,9 +84,17 @@ public class BankService {
     // 입금 가능 리스트
     public List<AccountDTO> getBankList(Long countryId) {
         Long accountListId = accountListRepository.findByCountryIdAndDivisionAndAvailable(countryId, false, true).get(0).getId();
-        List<AccountDTO> accountList =  accountRepository.findByAccountListId(accountListId).stream().map(account -> AccountDTO.builder()
-                .id(account.getId()).name(getStudentName(account.getId())).studentId(account.getStudentId()).rollNumber(getStudentRollNumber(account.getId())).build()).collect(Collectors.toList());
-        Collections.sort(accountList, new Comparator<AccountDTO>() {
+        List<Accounts> accountsList=  accountRepository.findByAccountListId(accountListId);
+        List<AccountDTO> accountDTOList = new ArrayList<>();
+        for(Accounts account :accountsList){
+            boolean isAvailable = studentRepository.findById(account.getStudentId()).orElseThrow().getAvailable();
+            if (isAvailable) {
+                accountDTOList.add(AccountDTO.builder()
+                        .id(account.getId()).name(getStudentName(account.getId())).studentId(account.getStudentId()).rollNumber(getStudentRollNumber(account.getId())).build());
+            }
+        }
+
+        Collections.sort(accountDTOList, new Comparator<AccountDTO>() {
             @Override
             public int compare(AccountDTO o1, AccountDTO o2) {
                 //학급번호로 오름차순 정렬
@@ -86,7 +104,7 @@ public class BankService {
                 return -1;
             }
         });
-        return accountList;
+        return accountDTOList;
     }
     //월급명세서
     public ApiResponseDTO<List<PaystubDTO>> getPaystub(Long studentId) {

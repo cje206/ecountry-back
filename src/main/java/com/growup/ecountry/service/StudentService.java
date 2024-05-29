@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.lang.model.type.NullType;
@@ -32,6 +33,7 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class StudentService {
+    private final RestTemplate restTemplate;
     private final StudentRepository studentRepository;
     private final CountryRepository countryRepository;
     private final AccountRepository accountRepository;
