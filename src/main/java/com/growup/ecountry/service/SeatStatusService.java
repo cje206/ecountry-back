@@ -30,11 +30,21 @@ public class SeatStatusService {
                     .countryId(seatStatusDTO.getCountryId()).build();
             if(seatStatusDTO.getOwnerId() != null) {
                 Students ownerStudent = studentRepository.findById(seatStatusDTO.getOwnerId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 학생입니다."));
-                seatStatus.setOwnerId(ownerStudent.getId());
+                if(ownerStudent.getAvailable()){
+                    seatStatus.setOwnerId(ownerStudent.getId());
+                }
+                else {
+                    seatStatus.setOwnerId(null);
+                }
             }
             if(seatStatusDTO.getStudentId() != null) {
                 Students student = studentRepository.findById(seatStatusDTO.getStudentId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 학생입니다."));
-                seatStatus.setStudentId(student.getId());
+                if(student.getAvailable()){
+                    seatStatus.setStudentId(student.getId());
+                }
+                else {
+                    seatStatus.setStudentId(null);
+                }
             }
             seatStatusRepository.save(seatStatus);
         }
@@ -51,9 +61,17 @@ public class SeatStatusService {
                         .id(seatStatus1.getId())
                         .rowNum(seatStatus1.getRowNum())
                         .colNum(seatStatus1.getColNum())
-                        .ownerId(seatStatus1.getOwnerId())
-                        .studentId(seatStatus1.getStudentId())
+                        .ownerId(null)
+                        .studentId(null)
                         .countryId(countries.getId()).build();
+                Students ownerStudent = studentRepository.findById(seatStatus1.getOwnerId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 학생입니다."));
+                if(ownerStudent.getAvailable()){
+                    seatStatusDTO.setOwnerId(ownerStudent.getId());
+                }
+                Students student = studentRepository.findById(seatStatus1.getStudentId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 학생입니다."));
+                if(student.getAvailable()){
+                    seatStatusDTO.setOwnerId(student.getId());
+                }
                 seatStatusDTOList.add(seatStatusDTO);
             }
             return new ApiResponseDTO<>(true, "자리 사용 현황", seatStatusDTOList);
