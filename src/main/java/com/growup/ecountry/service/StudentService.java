@@ -1,17 +1,17 @@
 package com.growup.ecountry.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.growup.ecountry.dto.AccountListDTO;
-import com.growup.ecountry.dto.ApiResponseDTO;
-import com.growup.ecountry.dto.CountryDTO;
-import com.growup.ecountry.dto.NoticeDTO;
-import com.growup.ecountry.dto.StudentDTO;
+import com.growup.ecountry.dto.*;
 import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,10 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Date;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -222,10 +219,10 @@ public class StudentService {
         }
     }
     //학생이미지 수정
-    public ApiResponseDTO<NullType> studentImgUpdate(Long countryId,StudentDTO studentDTO){
+    public ApiResponseDTO<String> studentImgUpdate(Long countryId,Long studentId, String img) {
         String API_URL = "https://api.kakaobrain.com/v2/inference/karlo/t2i";
 
-        Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentDTO.getId(),countryId);
+        Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentId,countryId);
         if(studentExist.isPresent()){
             Students student = studentExist.get();
                 student = Students.builder()
@@ -235,9 +232,56 @@ public class StudentService {
                         .pw(student.getPw())
                         .rating(student.getRating())
                         .countryId(student.getCountryId())
-                        .img(studentDTO.getImg()).build();
+                        .img(img).build();
                 studentRepository.save(student);
-                return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
+
+                if(student.getJobId() != null){
+                    Jobs studentJob = jobRepository.findById(student.getJobId()).get();
+                    Map<String, Object> requestData = new HashMap<>();
+                    requestData.put("version", "v2.1");
+                    requestData.put("prompt", "Show me a background photo of job as " + studentJob.getName() + "that looks modern and professional.");
+                    requestData.put("height", 1024);
+                    requestData.put("width", 1024);
+
+                    HttpHeaders headers = new HttpHeaders();
+                    String rest_api_key = System.getenv("KAKAO_REST_API_KEY");
+                    headers.set("Authorization", "KakaoAK " + rest_api_key);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+
+                    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestData, headers);
+                    ResponseEntity<KakaoResponse> responseEntity = restTemplate.postForEntity(API_URL, requestEntity, KakaoResponse.class);
+                    String imgUrl = null;
+                    if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                        imgUrl = responseEntity.getBody().getImages().get(0).getImage();
+                        return new ApiResponseDTO<>(true,"이미지 + 직업 이미지 변경 성공",imgUrl);
+                    } else {
+                        // 이부분은 카카오 api 오류 발생 시 예외처리
+                        return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
+                    }
+                }
+                else {
+                    Map<String, Object> requestData = new HashMap<>();
+                    requestData.put("version", "v2.1");
+                    requestData.put("prompt", "Show me a background photo of job as unemployed that looks ugly and bitterly.");
+                    requestData.put("height", 1024);
+                    requestData.put("width", 1024);
+
+                    HttpHeaders headers = new HttpHeaders();
+                    String rest_api_key = System.getenv("KAKAO_REST_API_KEY");
+                    headers.set("Authorization", "KakaoAK " + rest_api_key);
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+
+                    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestData, headers);
+                    ResponseEntity<KakaoResponse> responseEntity = restTemplate.postForEntity(API_URL, requestEntity, KakaoResponse.class);
+                    String imgUrl = null;
+                    if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                        imgUrl = responseEntity.getBody().getImages().get(0).getImage();
+                        return new ApiResponseDTO<>(true,"이미지 + 직업 이미지 변경 성공",imgUrl);
+                    } else {
+                        // 이부분은 카카오 api 오류 발생 시 예외처리
+                        return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
+                    }
+                }
         }
         else {
             return new ApiResponseDTO<>(false,"국민이 존재하지 않습니다",null);

@@ -91,8 +91,14 @@ public class StudentController {
     }
     //학생이미지 수정
     @PatchMapping("/user/img/{countryId}")
-    public ResponseEntity<ApiResponseDTO<NullType>> studentImgUpdate(@PathVariable Long countryId,@RequestBody StudentDTO studentDTO){
-        return ResponseEntity.ok(studentService.studentImgUpdate(countryId,studentDTO));
+    public ResponseEntity<ApiResponseDTO<String>> studentImgUpdate(@PathVariable("coutnryId") Long countryId,@RequestHeader("Authorization") String token,@RequestParam("img")String img) {
+        TokenDTO authToken = jwt.validateToken(token);
+        if(authToken != null && authToken.getIsStudent()) {
+            return ResponseEntity.ok(studentService.studentImgUpdate(countryId,authToken.getId(),img));
+        }
+        else {
+            return ResponseEntity.ok(new ApiResponseDTO<>(false,"학생만 이용가능 합니다",null));
+        }
     }
     //알림조회
     @GetMapping("/notice")
