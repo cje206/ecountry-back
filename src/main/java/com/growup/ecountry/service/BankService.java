@@ -6,12 +6,14 @@ import com.growup.ecountry.dto.BankDTO;
 import com.growup.ecountry.dto.CountryDTO;
 import com.growup.ecountry.entity.*;
 import com.growup.ecountry.repository.*;
+import jakarta.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
+import javax.lang.model.type.NullType;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,12 +28,19 @@ public class BankService {
     private final TaxRepository taxRepository;
     private final JobRepository jobRepository;
 
-    public String getStudentName(Long accountId) {
-        if(accountId == 0){
-            return "급여";
+    public String getStudentName(@Nullable Long accountId) {
+        try {
+            if(Objects.nonNull(accountId) && accountId == 0){
+                return "급여";
+            }
+            System.out.println("accountId : " + accountId);
+            Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
+            return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
+        }catch (Exception e){
+            System.out.println("이름가져오기 오류 accountId는 " +accountId + e.getMessage() );
+            return null;
         }
-        Long studentId = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getStudentId();
-        return studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다.")).getName();
+
     }
 
     public Integer getStudentRollNumber(Long accountId) {
