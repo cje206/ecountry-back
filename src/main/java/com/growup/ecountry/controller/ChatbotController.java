@@ -2,6 +2,7 @@ package com.growup.ecountry.controller;
 
 import com.growup.ecountry.dto.ApiResponseDTO;
 import com.growup.ecountry.service.ChatbotService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,4 +22,9 @@ public class ChatbotController {
         }
 
     }
+    @GetMapping("/check")
+    public ResponseEntity<ApiResponseDTO<String>> checkChatbot(){
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "hi", chatbotService.checkChatbotConnection()));
+    }
+
 }
