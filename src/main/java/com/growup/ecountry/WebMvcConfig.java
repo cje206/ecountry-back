@@ -12,11 +12,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${CHAT_BOT_SERVER}")
     String chatbotServer;
+    @Value("${FRONT_SERVER}")
+    String frontServer;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000","http://localhost:5000", chatbotServer)
+                .allowedOrigins("http://localhost:3000","http://localhost:5000", chatbotServer,frontServer)
                 .allowedMethods("GET", "POST", "PATCH", "DELETE");
     }
 }
