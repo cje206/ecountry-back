@@ -88,6 +88,7 @@ public class UserService {
                             .rating(student.getRating())
                             .img(student.getImg())
                             .jobId(null)
+                            .jobImg(null)
                             .countryId(student.getCountryId()).build();
                     return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
                 }
@@ -99,6 +100,7 @@ public class UserService {
                             .rating(student.getRating())
                             .img(student.getImg())
                             .jobId(student.getJobId())
+                            .jobImg(student.getJobImg())
                             .countryId(student.getCountryId()).build();
                     return new ApiResponseDTO<>(true, "학생 정보 조회", studentDTO);
                 }
@@ -107,7 +109,6 @@ public class UserService {
                 return new ApiResponseDTO<>(false, "존재하지 않는 학생입니다", null);
             }
         }
-
     }
     public Boolean pwUpdate(Long id, String pw){
         Optional<Users> userExist = userRepository.findById(id);

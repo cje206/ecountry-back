@@ -219,7 +219,7 @@ public class StudentService {
         }
     }
     //학생이미지 수정
-    public ApiResponseDTO<String> studentImgUpdate(Long countryId,Long studentId, String img) {
+    public ApiResponseDTO<NullType> studentImgUpdate(Long countryId,Long studentId, String img) {
         String API_URL = "https://api.kakaobrain.com/v2/inference/karlo/t2i";
 
         Optional<Students> studentExist = studentRepository.findByIdANDCountryId(studentId,countryId);
@@ -231,15 +231,15 @@ public class StudentService {
                         .rollNumber(student.getRollNumber())
                         .pw(student.getPw())
                         .rating(student.getRating())
+                        .available(student.getAvailable())
                         .countryId(student.getCountryId())
                         .img(img).build();
-                studentRepository.save(student);
-
+                //유직
                 if(student.getJobId() != null){
                     Jobs studentJob = jobRepository.findById(student.getJobId()).get();
                     Map<String, Object> requestData = new HashMap<>();
                     requestData.put("version", "v2.1");
-                    requestData.put("prompt", "Show me a background photo of job as " + studentJob.getName() + "that looks modern and professional.");
+                    requestData.put("prompt", "A photorealistic image of job as of job as " + studentJob.getName() + "that looks modern and professional.");
                     requestData.put("height", 1024);
                     requestData.put("width", 1024);
 
@@ -253,16 +253,21 @@ public class StudentService {
                     String imgUrl = null;
                     if (responseEntity.getStatusCode().is2xxSuccessful()) {
                         imgUrl = responseEntity.getBody().getImages().get(0).getImage();
-                        return new ApiResponseDTO<>(true,"이미지 + 직업 이미지 변경 성공",imgUrl);
+                        student.setJobImg(imgUrl);
+                        studentRepository.save(student);
+                        return new ApiResponseDTO<>(true,"이미지 + 직업 이미지 변경 성공",null);
                     } else {
                         // 이부분은 카카오 api 오류 발생 시 예외처리
+                        student.setJobImg(null);
+                        studentRepository.save(student);
                         return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
                     }
-                }
+                } // 무직
                 else {
                     Map<String, Object> requestData = new HashMap<>();
                     requestData.put("version", "v2.1");
-                    requestData.put("prompt", "Show me a background photo of job as unemployed that looks ugly and bitterly.");
+                    requestData.put("prompt", "A photorealistic image of school interior that looks modern and school-like.");
+                    requestData.put("negative_prompt", "human");
                     requestData.put("height", 1024);
                     requestData.put("width", 1024);
 
@@ -276,9 +281,13 @@ public class StudentService {
                     String imgUrl = null;
                     if (responseEntity.getStatusCode().is2xxSuccessful()) {
                         imgUrl = responseEntity.getBody().getImages().get(0).getImage();
-                        return new ApiResponseDTO<>(true,"이미지 + 직업 이미지 변경 성공",imgUrl);
+                        student.setJobImg(imgUrl);
+                        studentRepository.save(student);
+                        return new ApiResponseDTO<>(true,"이미지 + 직업 이미지 변경 성공",null);
                     } else {
                         // 이부분은 카카오 api 오류 발생 시 예외처리
+                        student.setJobImg(imgUrl);
+                        studentRepository.save(student);
                         return new ApiResponseDTO<>(true,"이미지 변경 성공",null);
                     }
                 }
