@@ -80,7 +80,7 @@ public class SeatStatusService {
                     if(seatStatus1.getStudentId() != null){
                         Students student = studentRepository.findById(seatStatus1.getStudentId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 학생입니다."));
                         if(student.getAvailable()){
-                            seatStatusDTO.setOwnerId(student.getId());
+                            seatStatusDTO.setStudentId(student.getId());
                         }
                     }
                     seatStatusDTOList.add(seatStatusDTO);
