@@ -23,7 +23,7 @@ public class ChatbotService {
     @Value("${CHAT_BOT_SERVER}")
     String chatbotServer;
 
-    //챗봇에 직업 등록
+    //챗봇에 직업, 과태료, 세금 등록
     public void insertChatbot(String data, String type){
         try{
             String url = chatbotServer + "/api/dialogflow/textQuery";
@@ -31,7 +31,7 @@ public class ChatbotService {
             JSONParser parser = new JSONParser();
             JSONObject insertData = new JSONObject();
 
-            insertData.put("text", type+"은 "+data);
+            insertData.put("text", type+ "등록 "+data);
             RestClient restClient = RestClient.create();
 
             System.out.println("insertData : "+insertData );
