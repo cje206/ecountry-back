@@ -70,13 +70,18 @@ public class SeatStatusService {
                             .ownerId(null)
                             .studentId(null)
                             .countryId(countries.getId()).build();
-                    Students ownerStudent = studentRepository.findById(seatStatus1.getOwnerId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 학생입니다."));
-                    if(ownerStudent.getAvailable()){
-                        seatStatusDTO.setOwnerId(ownerStudent.getId());
+                    //ownerId, studentId 각 ID 값 null 유무 확인
+                    if(seatStatus1.getOwnerId() != null){
+                        Students ownerStudent = studentRepository.findById(seatStatus1.getOwnerId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 학생입니다."));
+                        if(ownerStudent.getAvailable()){
+                            seatStatusDTO.setOwnerId(ownerStudent.getId());
+                        }
                     }
-                    Students student = studentRepository.findById(seatStatus1.getStudentId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 학생입니다."));
-                    if(student.getAvailable()){
-                        seatStatusDTO.setOwnerId(student.getId());
+                    if(seatStatus1.getStudentId() != null){
+                        Students student = studentRepository.findById(seatStatus1.getStudentId()).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 학생입니다."));
+                        if(student.getAvailable()){
+                            seatStatusDTO.setOwnerId(student.getId());
+                        }
                     }
                     seatStatusDTOList.add(seatStatusDTO);
                 }
