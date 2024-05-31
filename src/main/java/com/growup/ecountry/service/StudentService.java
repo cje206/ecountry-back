@@ -245,6 +245,7 @@ public class StudentService {
                     .rollNumber(student.getRollNumber())
                     .pw(studentDTO.getPw())
                     .rating(student.getRating())
+                    .available(student.getAvailable())
                     .countryId(student.getCountryId()).build();
             studentRepository.save(student);
             return new ApiResponseDTO<>(true,"비밀번호 변경 성공",null);

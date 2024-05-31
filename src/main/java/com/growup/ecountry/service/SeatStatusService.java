@@ -21,7 +21,7 @@ public class SeatStatusService {
     private final SeatStatusRepository seatStatusRepository;
     //학생 자리 사용 등록
     public ApiResponseDTO<NullType> setSeatStatus(List<SeatStatusDTO> seatStatusDTOs) {
-        Countries countries = countryRepository.findById(seatStatusDTOs.get(0).getCountryId()).orElseThrow(()->{ throw new IllegalArgumentException("국가가 존재하지 않습니다");});
+        Countries countries = countryRepository.findById(seatStatusDTOs.get(0).getCountryId()).orElseThrow(() -> new IllegalArgumentException("국가가 존재하지 않습니다"));
         if(countries.getAvailable()){
             for(SeatStatusDTO seatStatusDTO : seatStatusDTOs) {
                 SeatStatus seatStatus = SeatStatus.builder()
