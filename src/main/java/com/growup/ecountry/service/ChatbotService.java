@@ -31,7 +31,7 @@ public class ChatbotService {
             JSONParser parser = new JSONParser();
             JSONObject insertData = new JSONObject();
 
-            insertData.put("text", type+ " "+data);
+            insertData.put("text", type+ "등록 "+data);
             RestClient restClient = RestClient.create();
 
             System.out.println("insertData : "+insertData );
