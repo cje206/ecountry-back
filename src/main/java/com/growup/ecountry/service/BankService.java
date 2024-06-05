@@ -127,7 +127,7 @@ public class BankService {
                             .build();
                     paystubDTOList.add(paystubDTO);
                 }
-                else {
+                else if(tax.getDivision() != 3) {
                     PaystubDTO paystubDTO = PaystubDTO.builder()
                             .title(tax.getName())
                             .value(Integer.valueOf((int)Math.floor(-(tax.getTax())))) // 그외 나머지 고정금액
@@ -155,7 +155,7 @@ public class BankService {
                         .build();
                 paystubDTOList.add(paystubDTO);
             }
-            else {
+            else if(tax.getDivision() != 3) {
                 PaystubDTO paystubDTO = PaystubDTO.builder()
                         .title(tax.getName())
                         .value(Integer.valueOf((int)Math.floor(-(tax.getTax())))) // 그외 나머지 고정금액
@@ -177,7 +177,7 @@ public class BankService {
                 if(tax.getDivision() == 0) {
                     actualSalary = Integer.valueOf((int)Math.round(actualSalary - (actualSalary * tax.getTax() / 100)));
                 }
-                else {
+                else if(tax.getDivision() != 3) {
                     actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
                 }
             }
@@ -191,7 +191,7 @@ public class BankService {
                 if(tax.getDivision() == 0) {
                     actualSalary = Integer.valueOf((int)Math.round(actualSalary - (actualSalary * tax.getTax() / 100)));
                 }
-                else {
+                else if(tax.getDivision() != 3) {
                     actualSalary = Integer.valueOf((int)Math.floor(actualSalary - tax.getTax()));
                 }
             }
