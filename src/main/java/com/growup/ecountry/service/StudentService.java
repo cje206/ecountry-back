@@ -184,6 +184,7 @@ public class StudentService {
                             .available(student.getAvailable())
                             .rating(studentDTO.getRating())
                             .jobId(studentDTO.getJobId())
+                            .img(studentDTO.getImg())
                             .countryId(student.getCountryId()).build();
                     studentRepository.save(student);
                 }
@@ -267,6 +268,7 @@ public class StudentService {
                         .rating(student.getRating())
                         .available(student.getAvailable())
                         .countryId(student.getCountryId())
+                        .jobId(student.getJobId())
                         .img(img).build();
             studentRepository.save(student);
             return new ApiResponseDTO<>(true,"이미지 + 직업 이미지 변경 성공",null);
