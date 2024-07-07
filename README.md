@@ -51,7 +51,7 @@
 
 <br/>
 
-[프론트엔 깃허브]([https://github.com/cje206/ecountry-back.git](https://github.com/MinJeonng/ecountry-front))
+[프론트엔드 깃허브](https://github.com/MinJeonng/ecountry-front)
 
 <br/>
 
